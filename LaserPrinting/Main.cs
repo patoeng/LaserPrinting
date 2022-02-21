@@ -276,7 +276,8 @@ namespace LaserPrinting
                     resultMoveIn = oServiceUtil.ExecuteMoveIn(Tb_SerialNumber.Text, AppSettings.Resource, "", "", null, "",false, false, "", "", Convert.ToString(Dt_CycleTime.Value));
                     if (resultStart && resultMoveIn)
                     {
-                        bool resultMoveStd = oServiceUtil.ExecuteMoveStd(Tb_SerialNumber.Text, "", AppSettings.Resource);
+                        Dt_MoveOut.Value = DateTime.Now;
+                        bool resultMoveStd = oServiceUtil.ExecuteMoveStd(Tb_SerialNumber.Text, "", AppSettings.Resource, "", "", null, "", false, "", "", Convert.ToString(DateTime.Now));
                         if (resultMoveStd)
                         {
                             ContainerOfMfgOrder();
