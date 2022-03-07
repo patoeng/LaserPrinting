@@ -58,7 +58,7 @@ namespace LaserPrinting
         private static GetMaintenanceStatusDetails[] oMaintenanceStatus = null;
         private static ProductChanges oProductChanges = null;
         private static MfgOrderChanges oMfgOrderChanges = null;
-        private static ServiceUtil oServiceUtil = new ServiceUtil();
+        private  ServiceUtil oServiceUtil = new ServiceUtil();
         #endregion
 
         #region FUNCTION USEFULL
@@ -419,5 +419,10 @@ namespace LaserPrinting
             e.Handled = true;
         }
         #endregion
+
+        private void RealtimeMfg_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
