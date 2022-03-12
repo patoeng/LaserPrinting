@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ComponentFactory.Krypton.Toolkit;
@@ -12,10 +8,9 @@ using LaserPrinting.Model;
 using LaserPrinting.Helpers;
 using LaserPrinting.Services;
 using OpcenterWikLibrary;
-using Camstar.WCF.Services;
-using Camstar.WCF.ObjectStack;
 using System.Reflection;
-using System.Threading;
+using Camstar.WCF.ObjectStack;
+using MesData;
 
 
 namespace LaserPrinting
@@ -23,10 +18,10 @@ namespace LaserPrinting
     public partial class MainAuto : KryptonForm
     {
         #region Private fields
-        private static GetMaintenanceStatusDetails[] oMaintenanceStatus = null;
-        private static ProductChanges oProductChanges = null;
-        private static MfgOrderChanges oMfgOrderChanges = null;
-        private ServiceUtil oServiceUtil = new ServiceUtil();
+
+        private Mes _mesData;
+        private string _productWorkflow;
+        private DatalogFileWatcher _watcher;
 
         private delegate void DgDataSourceDelegate(KryptonDataGridView kdg, BindingList<LaserPrintingProduct> list);
 
@@ -36,6 +31,7 @@ namespace LaserPrinting
             InitializeComponent();
             InitLaserPrinting();
             InitFileWatcher();
+            InitSetting();
         }
         public void InitLaserPrinting()
         {
@@ -50,20 +46,31 @@ namespace LaserPrinting
             Pb_IndicatorPicture.Region = new Region(gp);
             this.WindowState = FormWindowState.Normal;
             this.Size = new Size(1028,810);
-           
 
-            GetStatusOfResource();
-            GetStatusMaintenanceDetails();
-            ContainerOfMfgOrder();
+#if MiniMe
+            var  name = "Laser Marking Minime";
+            Text = Mes.AddVersionNumber(Text + " MiniMe");
+#elif Ariel
+            var  name = "Laser Marking Ariel";
+            Text = Mes.AddVersionNumber(Text + " Ariel");
+#endif
 
+            _mesData = new Mes(name);
 
-            Text = OpecLibrary.AddVersionNumber(Text);
-            lbResourceName.Text = AppSettings.Resource;
+            MyTitle.Text = $"Laser Printing - {AppSettings.Resource}";
+            ResourceGrouping.Values.Heading = $"Resource Status: {AppSettings.Resource}";
+
         }
         private void InitFileWatcher()
         {
             var setting = new Properties.Settings();
-            var watcher = new DatalogFileWatcher(setting.LaserDatalogLocation, setting.LaserDatalogPattern, DatalogParserMethod);
+            _watcher = new DatalogFileWatcher(setting.LaserDatalogLocation, setting.LaserDatalogPattern);
+            _watcher.FileChangedDetected += DatalogParserMethod;
+        }
+        private void InitSetting()
+        {
+            var setting = new Properties.Settings();
+            _productWorkflow = setting.WorkFlow;
         }
 
         private void SetDgDataSource(KryptonDataGridView kdg, BindingList<LaserPrintingProduct> list)
@@ -76,204 +83,159 @@ namespace LaserPrinting
 
             kdg.DataSource = list;
         }
-        private bool DatalogParserMethod(string FileLocation)
+        private async Task<bool> DatalogParserMethod(string fileLocation)
         {
-            var dataLogFile = DatalogFile.GetDatalogFileByFileName("DatalogFile.db", FileLocation);
+            ThreadHelper.ControlSetText(Tb_Message, "");
+            if (_mesData.ManufacturingOrder == null)
+            {
+                ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing --->[{fileLocation}] Canceled, Invalid Manufacturing Order.");
+                return false;
+            }
+            if (_mesData.ResourceStatusDetails == null || _mesData.ResourceStatusDetails?.Availability != "Up")
+            {
+                ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing --->[{fileLocation}] Canceled, Resource is not in \"Up\" condition.");
+                return false;
+            }
+            ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}");
+
+            var dataLogFile = DatalogFile.GetDatalogFileByFileName("DatalogFile.db", fileLocation);
             var list = DatalogFile.FileParse(ref dataLogFile);
 
-            if (oMfgOrderChanges == null)
-            {
-                return true; 
-            }
-
             SetDgDataSource(kryptonDataGridView1, new BindingList<LaserPrintingProduct>(list));
-            
 
             // MoveStart, MoveIn, Move
             DatalogFile.SaveDatalogFileHistory("DatalogFile.db", dataLogFile);
 
             foreach(var sn in list)
             {
-                StartMoveInMove(sn);
+                var s = await StartMoveInMove(sn);
+                ThreadHelper.ControlAppendFirstText(Tb_Message,$"{DateTime.Now:s} :[{sn.Barcode}] ---> {s}");
             }
-           
+            ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}... Done");
+            await ContainerOfMfgOrder();
             return true;
         }
-        private void GetStatusOfResource()
+
+        private async Task SetMfgOrder()
         {
-            BackgroundWorker bw = new BackgroundWorker();
-            ResourceStatusDetails oResourceStatusDetails = null;
-           bw.DoWork += delegate
+            if (_watcher.Busy)
             {
-                try
-                {
-                    oResourceStatusDetails = OpecLibrary.GetStatusOfResource(AppSettings.Resource, oServiceUtil);
-
-                }
-                catch (Exception ex)
-                {
-                    ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
-                    EventLogUtil.LogErrorEvent(ex.Source, ex);
-                }
-
-            };
-
-            bw.RunWorkerCompleted += delegate
+                MessageBox.Show("Datalog Parsing In Progress");
+                return;
+            }
+            if (_mesData.ResourceStatusDetails == null || _mesData.ResourceStatusDetails?.Availability != "Up")
             {
-                if (oResourceStatusDetails != null)
+                MessageBox.Show("Canceled, Resource is not in \"Up\" condition."); 
+                return;
+            }
+            var mfg = await Mes.GetMfgOrder(_mesData, Tb_MfgOrder.Text);
+            _mesData.SetManufacturingOrder(mfg);
+
+            if (_mesData.ManufacturingOrder != null)
+            {
+                ClearTextBox();
+                if (_mesData.ManufacturingOrder.Name.ToString() != "") Tb_MfgOrder.Text = _mesData.ManufacturingOrder.Name.ToString();
+                if (_mesData.ManufacturingOrder.Product != null)
                 {
-                    if (oResourceStatusDetails.Status != null) ThreadHelper.ControlSetText(Tb_StatusCode, oResourceStatusDetails.Status.Name);
-                    if (oResourceStatusDetails.Reason != null) ThreadHelper.ControlSetText(Tb_StatusReason, oResourceStatusDetails.Reason.Name);
-                    if (oResourceStatusDetails.Availability != null)
-                    {
-                        ThreadHelper.ControlSetText(Tb_Availability, oResourceStatusDetails.Availability.Value);
-                        if (oResourceStatusDetails.Availability.Value == "Up")
-                        {
-                            ThreadHelper.ControlSetBgColor(Pb_IndicatorPicture, Color.Green);
-                        }
-                        else if (oResourceStatusDetails.Availability.Value == "Down")
-                        {
-                            ThreadHelper.ControlSetBgColor(Pb_IndicatorPicture, Color.Red);
-                        }
-                    }
-                    else
-                    {
-                        ThreadHelper.ControlSetBgColor(Pb_IndicatorPicture, Color.Orange);
-                    }
+                    Tb_MfgProduct.Text = _mesData.ManufacturingOrder.Product.Name;
+                    var productChanges = await Mes.GetProduct(_mesData, _mesData.ManufacturingOrder.Product.Name);
 
-                    if (oResourceStatusDetails.TimeAtStatus != null)
-                        ThreadHelper.ControlSetText(Tb_TimeAtStatus,
-                            DateTime.FromOADate(oResourceStatusDetails.TimeAtStatus.Value).ToString("s"));
+                    if (productChanges != null)
+                    {
+                        //Make Sure correct WorkFlow
+                        if (productChanges.Workflow.Name != _productWorkflow)
+                        {
+                            _mesData.SetManufacturingOrder(mfg);
+                            ClearTextBox();
+                            MessageBox.Show("Incorrect Product Work Flow!");
+                            return;
+                        }
+
+                        Tb_MfgWorkflow.Text = productChanges.Workflow.Name;
+                        Tb_MfgProductDescription.Text = Convert.ToString(productChanges.Description);
+                    }
                 }
-            };
-
-            bw.RunWorkerAsync();
-          
+                //if (_mesData.ManufacturingOrder.isWorkflow != null) Tb_MfgWorkflow.Text = _mesData.ManufacturingOrder.isWorkflow.Name;
+                if (_mesData.ManufacturingOrder.UOM != null) Tb_MfgUOM.Text = _mesData.ManufacturingOrder.UOM.Name;
+                if (_mesData.ManufacturingOrder.sswQtyStarted != null) Tb_MfgInProcess.Text = Convert.ToString(_mesData.ManufacturingOrder.sswQtyStarted);
+                if (_mesData.ManufacturingOrder.Qty != null) Tb_MfgQty.Text = Convert.ToString(_mesData.ManufacturingOrder.Qty);
+                if (Convert.ToString(_mesData.ManufacturingOrder.PlannedStartDate) != "") Tb_MfgStartedDate.Text = Convert.ToString(_mesData.ManufacturingOrder.PlannedStartDate);
+                if (Convert.ToString(_mesData.ManufacturingOrder.PlannedCompletionDate) != "") Tb_MfgEndDate.Text = Convert.ToString(_mesData.ManufacturingOrder.PlannedCompletionDate);
+                await ContainerOfMfgOrder();
+            }
+            else
+            {
+                MessageBox.Show("Manufacturing Order is not found!");
+            }
         }
-        private void ContainerOfMfgOrder()
+        private async Task ContainerOfMfgOrder()
         {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += delegate
+            var mfg = await Mes.GetMfgOrder(_mesData, Tb_MfgOrder.Text);
+            _mesData.SetManufacturingOrder(mfg);
+
+            if (InvokeRequired)
             {
-                try
-                {
-                    if (Tb_MfgOrder.Text != "")
-                    {
-                        oMfgOrderChanges = OpecLibrary.ContainerOfMfgOrder(Tb_MfgOrder.Text, oServiceUtil);
-                       
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod().Name : MethodBase.GetCurrentMethod().Name + "." + ex.Source;
-                    EventLogUtil.LogErrorEvent(ex.Source, ex);
-                }
-
-            };
-
-            bw.RunWorkerCompleted += delegate
+                Invoke(new MethodInvoker(() => Lb_ContainerList.Items.Clear()));
+            }
+            else
             {
                 Lb_ContainerList.Items.Clear();
-                if (oMfgOrderChanges != null)
+            }
+           
+            if (_mesData.ManufacturingOrder != null)
+            {
+                if (_mesData.ManufacturingOrder.Name != null) ThreadHelper.ControlSetText(MfgContainerLabel, $"List Container of {_mesData.ManufacturingOrder.Name}");
+                if (_mesData.ManufacturingOrder.Containers != null)
                 {
-                    if (oMfgOrderChanges.Name != null) MfgContainerLabel.Text = $"List Container of {oMfgOrderChanges.Name}";
-                    if (oMfgOrderChanges.Containers != null)
+                    if (_mesData.ManufacturingOrder.Containers.Length > 0)
                     {
-                        if (oMfgOrderChanges.Containers.Length > 0)
+                        //var oListOfContainer = oMfgOrderChanges.Containers.OrderBy(x => x.Value.ToString()).ToList();
+                        foreach (var container in _mesData.ManufacturingOrder.Containers)
                         {
-                            //var oListOfContainer = oMfgOrderChanges.Containers.OrderBy(x => x.Value.ToString()).ToList();
-                            foreach (var container in oMfgOrderChanges.Containers)
+                            if (InvokeRequired)
+                            {
+                                Invoke(new MethodInvoker(() => Lb_ContainerList.Items.Add(container.Value)));
+                            }
+                            else
                             {
                                 Lb_ContainerList.Items.Add(container.Value);
                             }
                         }
-
-                        Tb_MfgInProcess.Text =  Lb_ContainerList.Items.Count.ToString();
                     }
-                }
-            };
 
-            bw.RunWorkerAsync();
+                    ThreadHelper.ControlSetText(Tb_MfgInProcess, Lb_ContainerList.Items.Count.ToString());
+                }
+            }
+           
         }
-        private void GetMfgOrderMustBeDoing()
+       
+        private async Task<string> StartMoveInMove(LaserPrintingProduct product)
         {
             try
             {
-                MfgOrderChanges oMfgOrderChanges = oServiceUtil.GetMfgOrderDispatch();
-                if (oMfgOrderChanges != null)
-                {
-                    ClearTextBox();
-                    if (oMfgOrderChanges.Name.ToString() != "") Tb_MfgOrder.Text = oMfgOrderChanges.Name.ToString();
-                    if (oMfgOrderChanges.Product != null)
-                    {
-                        Tb_MfgProduct.Text = oMfgOrderChanges.Product.Name;
-                        oProductChanges = oServiceUtil.GetProduct(oMfgOrderChanges.Product.Name);
-                        if (oProductChanges != null) Tb_MfgProductDescription.Text = Convert.ToString(oProductChanges.Description);
-                    }
-                    if (oMfgOrderChanges.isWorkflow != null) Tb_MfgWorkflow.Text = oMfgOrderChanges.isWorkflow.Name;
-                    if (oMfgOrderChanges.UOM != null) Tb_MfgUOM.Text = oMfgOrderChanges.UOM.Name;
-                    if (oMfgOrderChanges.sswQtyStarted != null) Tb_MfgInProcess.Text = Convert.ToString(oMfgOrderChanges.sswQtyStarted);
-                    if (oMfgOrderChanges.Qty != null) Tb_MfgQty.Text = Convert.ToString(oMfgOrderChanges.Qty);
-                    if (Convert.ToString(oMfgOrderChanges.PlannedStartDate) != "") Tb_MfgStartedDate.Text = Convert.ToString(oMfgOrderChanges.PlannedStartDate);
-                    if (Convert.ToString(oMfgOrderChanges.PlannedCompletionDate) != "") Tb_MfgEndDate.Text = Convert.ToString(oMfgOrderChanges.PlannedCompletionDate);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod().Name : MethodBase.GetCurrentMethod().Name + "." + ex.Source;
-                EventLogUtil.LogErrorEvent(ex.Source, ex);
-            }
-        }
-        private void StartMoveInMove(LaserPrintingProduct laserPrintingProduct)
-        {
-            try
-            {
-                bool resultStart = false;
-                bool resultMoveIn = false;
-                if (Tb_MfgOrder.Text != "" && laserPrintingProduct.Barcode != "")
-                {
-                    resultStart = oServiceUtil.ExecuteStart(laserPrintingProduct.Barcode, Tb_MfgOrder.Text, Tb_MfgProduct.Text, "", Tb_MfgWorkflow.Text, "", "Unit", "Production", "Normal", "", 1, Tb_MfgUOM.Text, "", "", Convert.ToString(laserPrintingProduct.PrintedStartDateTime));
-                    resultMoveIn = oServiceUtil.ExecuteMoveIn(laserPrintingProduct.Barcode, AppSettings.Resource, "", "", null, "", false, false, "", "", Convert.ToString(laserPrintingProduct.PrintedStartDateTime));
-                    if (resultStart && resultMoveIn)
-                    {
-                        
-                        bool resultMoveStd = oServiceUtil.ExecuteMoveStd(laserPrintingProduct.Barcode, "", AppSettings.Resource, "", "", null, "", false, "", "", Convert.ToString(DateTime.Now));
-                        if (resultMoveStd)
-                        {
-                           // ContainerOfMfgOrder();
-                            //MessageBox.Show("Container success to Started, MoveIn and Moved Std");
-                        }
-                        else
-                        {
-                           // MessageBox.Show("Container success to Started and MoveIn but failed to Moved Std");
-                        }
-                    }
-                    else
-                    {
-                       // MessageBox.Show("Container failed to Started and Move In");
-                    }
-                }
-                else
-                {
-                   // MessageBox.Show("Manufacturing Order or Container Name is Needed!");
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod().Name : MethodBase.GetCurrentMethod().Name + "." + ex.Source;
-                EventLogUtil.LogErrorEvent(ex.Source, ex);
-            }
-        }
-        private void kryptonButton1_Click(object sender, EventArgs e)
-        {
-            var dtl = new DatalogFile
-            {
-                Id = Guid.NewGuid(),
-                FileName = @"C:\Users\Precision\Downloads\Laser marking\HL_20211014.txt"
-            };
+                if (_mesData.ManufacturingOrder.Name == "" || product.Barcode == "")
+                    return "Manufacturing Order And Container Name is Needed!";
 
-            var list = DatalogFile.FileParse(ref dtl);
+                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode,(string) _mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name, Tb_MfgWorkflow.Text, Tb_MfgUOM.Text, product.PrintedStartDateTime);
+                var resultMoveIn = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                if (!resultStart || !resultMoveIn) return "Container failed to Start and Move In";
+
+                var cDataPoint = new DataPointDetails[1];
+                cDataPoint[0] = new DataPointDetails { DataName = "Article Number", DataValue= !string.IsNullOrEmpty(product.ArticleNumber) ? product.ArticleNumber : "NA", DataType = DataTypeEnum.String };
+
+                var resultMoveStd =
+                    await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                return resultMoveStd ? "Container success to Start, MoveIn and Moved Std" : "Container success to Start and MoveIn but failed to Moved Std";
+
+            }
+            catch (Exception ex)
+            {
+                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
+                EventLogUtil.LogErrorEvent(ex.Source, ex);
+                return "Exception";
+            }
         }
+     
 
         private void RealtimeMfg_Click(object sender, EventArgs e)
         {
@@ -303,14 +265,13 @@ namespace LaserPrinting
             }
         }
 
-        private void TimerRealtime_Tick(object sender, EventArgs e)
+        private async void TimerRealtime_Tick(object sender, EventArgs e)
         {
             TimerRealtime.Stop();
 
            
-                GetStatusOfResource();
-                GetStatusMaintenanceDetails();
-                ContainerOfMfgOrder();
+                await GetStatusOfResource();
+                await GetStatusMaintenanceDetails();
                 if (RealtimeMfg.Checked == true)
                 {
                     //  GetMfgOrderMustBeDoing();
@@ -319,28 +280,14 @@ namespace LaserPrinting
                 TimerRealtime.Start();
         }
 
-        private void GetStatusMaintenanceDetails()
+        private async Task GetStatusMaintenanceDetails()
         {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += delegate
+            try
             {
-                try
+                var maintenanceStatusDetails = await Mes.GetMaintenanceStatusDetails(_mesData);
+                if (maintenanceStatusDetails != null)
                 {
-                    oMaintenanceStatus = oServiceUtil.GetGetMaintenanceStatus(AppSettings.Resource);
-                }
-                catch (Exception ex)
-                {
-                    ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod().Name : MethodBase.GetCurrentMethod().Name + "." + ex.Source;
-                    EventLogUtil.LogErrorEvent(ex.Source, ex);
-                }
-
-            };
-
-            bw.RunWorkerCompleted += delegate
-            {
-                if (oMaintenanceStatus != null)
-                {
-                    Dg_Maintenance.DataSource = oMaintenanceStatus;
+                    Dg_Maintenance.DataSource = maintenanceStatusDetails;
                     Dg_Maintenance.Columns["Due"].Visible = false;
                     Dg_Maintenance.Columns["Warning"].Visible = false;
                     Dg_Maintenance.Columns["PastDue"].Visible = false;
@@ -371,61 +318,62 @@ namespace LaserPrinting
                     Dg_Maintenance.Columns["CDOTypeName"].Visible = false;
                     Dg_Maintenance.Columns["key"].Visible = false;
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
+                EventLogUtil.LogErrorEvent(ex.Source, ex);
+            }
+        }
+        private async Task GetStatusOfResource()
+        {
+            try
+            {
+                var resourceStatus = await Mes.GetResourceStatusDetails(_mesData);
+                _mesData.SetResourceStatusDetails(resourceStatus);
 
+                if (resourceStatus != null)
+                {
+                    if (resourceStatus.Status != null) Tb_StatusCode.Text = resourceStatus.Status.Name;
+                    if (resourceStatus.Reason != null) Tb_StatusReason.Text = resourceStatus.Reason.Name;
+                    if (resourceStatus.Availability != null)
+                    {
+                        Tb_Availability.Text = resourceStatus.Availability.Value;
+                        if (resourceStatus.Availability.Value == "Up")
+                        {
+                            Pb_IndicatorPicture.BackColor = Color.Green;
+                        }
+                        else if (resourceStatus.Availability.Value == "Down")
+                        {
+                            Pb_IndicatorPicture.BackColor = Color.Red;
+                        }
+                    }
+                    else
+                    {
+                        Pb_IndicatorPicture.BackColor = Color.Orange;
+                    }
 
-            };
-            bw.RunWorkerAsync();
-            
-           
+                    if (resourceStatus.TimeAtStatus != null)
+                        Tb_TimeAtStatus.Text =
+                            $@"{DateTime.FromOADate(resourceStatus.TimeAtStatus.Value) - Mes.ZeroEpoch():G}";
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
+                EventLogUtil.LogErrorEvent(ex.Source, ex);
+            }
         }
 
-        private void Bt_SetMfgOrder_Click(object sender, EventArgs e)
+        private async void Bt_SetMfgOrder_Click(object sender, EventArgs e)
         {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += delegate
-            {
-                try
-                {
-                    if (Tb_MfgOrder.Text != "")
-                    {
-                        oMfgOrderChanges = oServiceUtil.GetMfgOrder(Tb_MfgOrder.Text);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
-                    EventLogUtil.LogErrorEvent(ex.Source, ex);
-                }
-
-            };
-
-            bw.RunWorkerCompleted += delegate
-            {
-                if (oMfgOrderChanges != null)
-                {
-                    ClearTextBox();
-                    if (oMfgOrderChanges.Name.ToString() != "") Tb_MfgOrder.Text = oMfgOrderChanges.Name.ToString();
-                    if (oMfgOrderChanges.Product != null)
-                    {
-                        Tb_MfgProduct.Text = oMfgOrderChanges.Product.Name;
-                        oProductChanges = oServiceUtil.GetProduct(oMfgOrderChanges.Product.Name);
-                        if (oProductChanges != null) Tb_MfgProductDescription.Text = Convert.ToString(oProductChanges.Description);
-                    }
-                    if (oMfgOrderChanges.isWorkflow != null) Tb_MfgWorkflow.Text = oMfgOrderChanges.isWorkflow.Name;
-                    if (oMfgOrderChanges.UOM != null) Tb_MfgUOM.Text = oMfgOrderChanges.UOM.Name;
-                    if (oMfgOrderChanges.sswQtyStarted != null) Tb_MfgInProcess.Text = Convert.ToString(oMfgOrderChanges.sswQtyStarted);
-                    if (oMfgOrderChanges.Qty != null) Tb_MfgQty.Text = Convert.ToString(oMfgOrderChanges.Qty);
-                    if (Convert.ToString(oMfgOrderChanges.PlannedStartDate) != "") Tb_MfgStartedDate.Text = Convert.ToString(oMfgOrderChanges.PlannedStartDate);
-                    if (Convert.ToString(oMfgOrderChanges.PlannedCompletionDate) != "") Tb_MfgEndDate.Text = Convert.ToString(oMfgOrderChanges.PlannedCompletionDate);
-                    ContainerOfMfgOrder();
-                }
-                else
-                {
-                    MessageBox.Show("Manufacturing Order is not found!");
-                }
-            };
-
-            bw.RunWorkerAsync();
+            Bt_SetMfgOrder.Enabled = false;
+            Tb_MfgOrder.Enabled = false;
+            RealtimeMfg.Enabled = false;
+            await SetMfgOrder();
+            Bt_SetMfgOrder.Enabled = true;
+            Tb_MfgOrder.Enabled = true;
+            RealtimeMfg.Enabled = true;
         }
         private void ClearTextBox()
         {
@@ -439,9 +387,32 @@ namespace LaserPrinting
             Tb_MfgUOM.Clear();
         }
 
-        private void Tb_MfgOrder_KeyUp(object sender, KeyEventArgs e)
+        private async void Tb_MfgOrder_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode==Keys.Enter) Bt_SetMfgOrder_Click(this,null);
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (string.IsNullOrEmpty(Tb_MfgOrder.Text))return;
+                Bt_SetMfgOrder.Enabled = false;
+                Tb_MfgOrder.Enabled = false;
+                RealtimeMfg.Enabled = false;
+                await SetMfgOrder();
+                Bt_SetMfgOrder.Enabled = true;
+                Tb_MfgOrder.Enabled = true;
+                RealtimeMfg.Enabled = true;
+            }
+        }
+
+        private async void MainAuto_Load(object sender, EventArgs e)
+        {
+            await GetStatusOfResource();
+            await GetStatusMaintenanceDetails();
+            ActiveControl = Tb_MfgOrder;
+        }
+
+        private async void btnResourceSetup_Click(object sender, EventArgs e)
+        {
+            Mes.ResourceSetupForm(this, _mesData, MyTitle.Text);
+            await GetStatusOfResource();
         }
     }
 }

@@ -41,15 +41,21 @@ namespace LaserPrinting.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("DatalogFile.db")]
         public string DatalogFileDatabaseLocation {
             get {
                 return ((string)(this["DatalogFileDatabaseLocation"]));
             }
-            set {
-                this["DatalogFileDatabaseLocation"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Minime Workflow")]
+        public string WorkFlow {
+            get {
+                return ((string)(this["WorkFlow"]));
             }
         }
     }

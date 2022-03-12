@@ -87,7 +87,7 @@ namespace LaserPrinting
                     oMfgOrderChanges = oServiceUtil.GetMfgOrder(Tb_MfgOrder.Text);
                     if (oMfgOrderChanges != null)
                     {
-                        if (oMfgOrderChanges.Name != null) MfgContainerLabel.Text = $"List Container of {oMfgOrderChanges.Name.ToString()}";
+                        if (oMfgOrderChanges.Name != null) MfgContainerLabel.Text = $@"List Container of {oMfgOrderChanges.Name}";
                         if (oMfgOrderChanges.Containers != null)
                         {
                             if (oMfgOrderChanges.Containers.Length > 0)
@@ -95,7 +95,7 @@ namespace LaserPrinting
                                 //var oListOfContainer = oMfgOrderChanges.Containers.OrderBy(x => x.Value.ToString()).ToList();
                                 foreach (var container in oMfgOrderChanges.Containers)
                                 {
-                                    Lb_ContainerList.Items.Add(container.Value.ToString());
+                                    Lb_ContainerList.Items.Add(container.Value);
                                 }
                             }
 

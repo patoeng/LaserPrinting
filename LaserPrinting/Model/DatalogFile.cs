@@ -56,7 +56,7 @@ namespace LaserPrinting.Model
                         Barcode = barcodeString,
                         PrintedStartDateTime = dt,
                         PrintedEndDateTime = dt,
-                        //MarkCount = Convert.ToInt32(markCount)
+                        ArticleNumber = ""
                     };
                     markCount++;
                     product.MarkCount = markCount;
@@ -89,9 +89,7 @@ namespace LaserPrinting.Model
 
                 var con = new SQLiteConnection($"Data Source={path};Version=3;");
                 con.Open();
-                //check if data exist 
-
-               
+           
 
                 var cmd = new SQLiteCommand(con);
                 var dataExist = GetDatalogFileById(databaseFile, datalogFile.Id);
@@ -152,11 +150,13 @@ namespace LaserPrinting.Model
         }
         public static List<SQLiteParameter> DatalogFileToCmdParameter(DatalogFile datalogFile)
         {
-            var list = new List<SQLiteParameter>();
-            list.Add(new SQLiteParameter("@id",datalogFile.Id.ToString()));
-            list.Add(new SQLiteParameter("@fileName", datalogFile.FileName));
-            list.Add(new SQLiteParameter("@lastRowIndex", datalogFile.LastRowIndex));
-            list.Add(new SQLiteParameter("@lastMarkCount", datalogFile.LastMarkCount));
+            var list = new List<SQLiteParameter>
+            {
+                new SQLiteParameter("@id", datalogFile.Id.ToString()),
+                new SQLiteParameter("@fileName", datalogFile.FileName),
+                new SQLiteParameter("@lastRowIndex", datalogFile.LastRowIndex),
+                new SQLiteParameter("@lastMarkCount", datalogFile.LastMarkCount)
+            };
 
             return list;
         }
@@ -204,8 +204,10 @@ namespace LaserPrinting.Model
         }
         public static DatalogFile GetDatalogFileById(string databaseFile, Guid identity)
         {
-            DatalogFile df = new DatalogFile();
-            df.Id = identity;
+            DatalogFile df = new DatalogFile
+            {
+                Id = identity
+            };
 
             var path = Path.GetFullPath(databaseFile);
             if (!File.Exists(path)) return df;

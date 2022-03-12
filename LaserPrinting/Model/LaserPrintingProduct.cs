@@ -13,5 +13,6 @@ namespace LaserPrinting.Model
         public DateTime PrintedStartDateTime { get; set; }
         public int MarkCount { get; set; }
         public Guid DatalogFileId { get; set; }
+        public string ArticleNumber { get; set; }
     }
 }

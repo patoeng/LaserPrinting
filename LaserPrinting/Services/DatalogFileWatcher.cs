@@ -9,13 +9,14 @@ namespace LaserPrinting.Services
 {
     public class DatalogFileWatcher
     {
-        public delegate bool FileChangedMethod(string filename);
+        public delegate Task<bool> FileChangedMethod(string filename);
 
-        public DatalogFileWatcher(string fileLocation, string filePattern, FileChangedMethod fileChangedMethod)
+        public event FileChangedMethod FileChangedDetected;
+
+        public DatalogFileWatcher(string fileLocation, string filePattern)
         {
             FileLocation = fileLocation;
             FilePattern = filePattern;
-            _fileChangedMethod = fileChangedMethod;
             InitFileWatcher(FileLocation, FilePattern);
         }
         public string FileLocation { get; protected set; } = @".\";
@@ -24,7 +25,6 @@ namespace LaserPrinting.Services
         
 
         private FileSystemWatcher _fileSystemWatcher;
-        private FileChangedMethod _fileChangedMethod;
 
         public void InitFileWatcher(string fileLocation, string filePattern)
         {
@@ -43,14 +43,11 @@ namespace LaserPrinting.Services
             _fileSystemWatcher.EnableRaisingEvents = true;
         }
 
-        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        private async void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
         {
             if (Busy) return;
             Busy = true;
-            if (_fileChangedMethod != null)
-            {
-                var executeOk = _fileChangedMethod(e.FullPath);
-            }
+            if (FileChangedDetected!=null) await FileChangedDetected?.Invoke(e.FullPath);
             Busy = false;
         }
     }
