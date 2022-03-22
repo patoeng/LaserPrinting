@@ -12,6 +12,7 @@ using OpcenterWikLibrary;
 using System.Reflection;
 using Camstar.WCF.ObjectStack;
 using MesData;
+using Path = Camstar.WCF.ObjectStack.Path;
 
 
 namespace LaserPrinting
@@ -38,7 +39,7 @@ namespace LaserPrinting
             }
             catch (Exception ex)
             {
-                File.WriteAllText(DateTime.Now.ToString("yyyymmddss"),ex.Source +" "+ex.Message);
+                File.WriteAllText(DateTime.Now.ToString("yyyyMMddHHmmss"),ex.Source +" "+ex.Message);
             }
         }
         public void InitLaserPrinting()
@@ -93,6 +94,7 @@ namespace LaserPrinting
         }
         private async Task<bool> DatalogParserMethod(string fileLocation)
         {
+            var fileNewPath = fileLocation.Replace('\\', '/');
             ThreadHelper.ControlSetText(Tb_Message, "");
             if (_mesData.ManufacturingOrder == null)
             {
@@ -106,14 +108,19 @@ namespace LaserPrinting
             }
             ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}");
 
-            var dataLogFile = DatalogFile.GetDatalogFileByFileName("DatalogFile.db", fileLocation);
+            var result = await DatalogFile.GetDatalogFileByFileName(fileNewPath);
+            if (!result.Result) return false;
+            var dataLogFile = (DatalogFile) result.Data;
             var list = DatalogFile.FileParse(ref dataLogFile);
 
             SetDgDataSource(kryptonDataGridView1, new BindingList<LaserPrintingProduct>(list));
 
             // MoveStart, MoveIn, Move
-            DatalogFile.SaveDatalogFileHistory("DatalogFile.db", dataLogFile);
-
+            var save = await DatalogFile.SaveDatalogFileHistory(dataLogFile);
+            if (!save.Result)
+            {
+                return false;
+            }
             foreach(var sn in list)
             {
                 var s = await StartMoveInMove(sn);

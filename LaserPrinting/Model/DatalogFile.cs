@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Globalization;
+using System.Threading.Tasks;
+using FirebirdSql.Data.FirebirdClient;
+using MesData;
 
 namespace LaserPrinting.Model
 {
@@ -13,7 +15,8 @@ namespace LaserPrinting.Model
         public int LastRowIndex { get; set; }
         public int LastMarkCount { get; set; }
 
-
+        public const string Database= "data source=EMBED;user id=SYSDBA;password=meey;initial catalog=DatalogFile.FDB;server type=Embedded;client library=.\\Firebird\\fbclient.dll";
+        public const string DbFileName = "DatalogFile.FDB";
         public static List<LaserPrintingProduct> FileParse(ref DatalogFile datalogFile)
         {
             if (!File.Exists(datalogFile.FileName))
@@ -21,13 +24,24 @@ namespace LaserPrinting.Model
                 datalogFile = null;
                 return null;
             };
+            var text = "";
+            using (FileStream fs = new FileStream(datalogFile.FileName, FileMode.Open, FileAccess.Read,
+                       FileShare.ReadWrite))
+            {
+                using (var stream = new StreamReader(fs))
+                {
+                    text = stream.ReadToEnd();
+                }
+            }
 
-            var text = File.ReadAllLines(datalogFile.FileName);
+            var textSplit = text.Split('\n');
+            
             var index = 0;
             var data = new List<LaserPrintingProduct>();
             var markCount = 0;
-            foreach (var str in text)
+            foreach (var stri in textSplit)
             {
+                var str = stri.Trim();
                 if (string.IsNullOrEmpty(str))
                 {
                     index++;
@@ -36,16 +50,12 @@ namespace LaserPrinting.Model
                 if (str.Contains("the MarkCode:"))// mark indicator, get barcode, date start, and mark count
                 {
                    // get date
-                    DateTime dt;
-                    var dateString = str.Substring(0, 23);
-                    var tryDate = DateTime.TryParseExact(dateString, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+                   var dateString = str.Substring(0, 23);
+                    var tryDate = DateTime.TryParseExact(dateString, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt);
                     if (!tryDate) continue;
 
                     //get barcode
-                    var barcodeString = str.Substring(str.IndexOf("Code:") + 5, 19);
-
-                   // get Mark Count
-                    //var markCount = str.Substring(str.IndexOf("Count:") + 6, str.IndexOf(",Marking") - str.IndexOf("Count:") - 6);
+                    var barcodeString = str.Substring(str.IndexOf("Code:", StringComparison.Ordinal) + 5, 19);
 
                     var product = new LaserPrintingProduct
                     {
@@ -72,135 +82,126 @@ namespace LaserPrinting.Model
             }
             return data;
         }
-        public static bool SaveDatalogFileHistory(string databaseFile, DatalogFile datalogFile)
+        public static async Task<TransactionResult> SaveDatalogFileHistory( DatalogFile datalogFile, string databaseFile=DbFileName)
         {
             //Check if database file exist, try create if not exist.
             if (!File.Exists(databaseFile))
             {
-                var rslt = DatalogFile.CreateDatabaseFile(databaseFile);
-                if (!rslt) return false;
+                var rslt = await CreateDatabaseFile(databaseFile);
+                if (!rslt.Result) return rslt;
             }
             try
             {
-                var path = Path.GetFullPath(databaseFile);
-
-                var con = new SQLiteConnection($"Data Source={path};Version=3;");
+                var con = new FbConnection(Database);
                 con.Open();
 
 
                 
-                var dataExist = GetDatalogFileById(databaseFile, datalogFile.Id);
+                var dataExist = await GetDatalogFileById( datalogFile.Id, databaseFile);
                 var commandText = "";
-                if (dataExist == null) //insert new if null
-                {
-                    commandText = "INSERT INTO DatalogFiles (Id,FileName,LastRowIndex,LastMarkCount) VALUES(@id,@fileName,@lastRowIndex,@lastMarkCount)";
-                }
-                else //update
-                {
-                    commandText = "UPDATE DatalogFiles SET FileName=@fileName, LastRowIndex=@lastRowIndex,LastMarkCount=@lastMarkCount WHERE id=@id";
-                }
-                var cmd = new SQLiteCommand(commandText,con);
-                var cmdParam = DatalogFileToCmdParameter(datalogFile);
-                cmd.Parameters.AddRange(cmdParam.ToArray());
-                cmd.Prepare();
-                cmd.ExecuteNonQuery();
 
-                con.Close();
-                return true;
+                commandText= dataExist.Data == null ? "INSERT INTO DatalogFiles (Id,FileName,LastRowIndex,LastMarkCount) VALUES (@id,@fileName,@lastRowIndex,@lastMarkCount)" : "UPDATE DatalogFiles SET FileName=@fileName, LastRowIndex=@lastRowIndex,LastMarkCount=@lastMarkCount WHERE id=@id";
+                var cmd = new FbCommand(commandText,con);
+                var cmdParam = DatalogFileToCmdParameter(datalogFile);
+                cmd.Parameters.AddRange(cmdParam);
+                await cmd.PrepareAsync();
+                var result = await cmd.ExecuteNonQueryAsync() ;
+                await con.CloseAsync();
+                return TransactionResult.Create(true,result);
+            }
+            catch (FbException exception)
+            {
+                return TransactionResult.Create(false, exception,exception.ErrorCode,exception.Message);
             }
             catch (Exception exception)
             {
-                return false;
+                return TransactionResult.Create(false, exception, -1, exception.Message);
             }
-           
 
         }
-        public static bool CreateDatabaseFile(string databaseFile)
+        public static async Task<TransactionResult> CreateDatabaseFile(string databaseFile)
         {
             //Check if database file exist, try create if not exist.
-            if (File.Exists(databaseFile)) return true;
-
-           
-
+            if (File.Exists(databaseFile)) return TransactionResult.Create(true);
             try
             {
-                var path = Path.GetFullPath(databaseFile);
-                SQLiteConnection.CreateFile(path);
+                await FbConnection.CreateDatabaseAsync(Database);
 
-                File.WriteAllBytes(path,Array.Empty<byte>());
-                var con = new SQLiteConnection($"Data Source={path};Version=3;");
+                var con = new FbConnection(Database);
                 con.Open();
-
-               
-
-                var cmd = new SQLiteCommand("DROP TABLE IF EXISTS DatalogFiles",con);
-                cmd.ExecuteNonQuery();
-                cmd = new SQLiteCommand(@"CREATE TABLE DatalogFiles(id string PRIMARY KEY,FileName TEXT, LastRowIndex INT, LastMarkCount INT)", con);
-                cmd.ExecuteNonQuery();
-                con.Close();
-                return true;
+                
+                var cmd = new FbCommand(@"CREATE TABLE DATALOGFILES(ID VARCHAR(38)  PRIMARY KEY, FileName VARCHAR(300), LastRowIndex INTEGER, LastMarkCount INTEGER)", con);
+                var result = await cmd.ExecuteNonQueryAsync();
+                await con.CloseAsync();
+                return TransactionResult.Create(true, result);
             }
-            catch
+            catch (FbException exception)
             {
-                return false;
+                return TransactionResult.Create(false, exception, exception.ErrorCode, exception.Message);
             }
-          
+            catch (Exception exception)
+            {
+                return TransactionResult.Create(false, exception, -1, exception.Message);
+            }
         }
-        public static List<SQLiteParameter> DatalogFileToCmdParameter(DatalogFile datalogFile)
+        public static List<FbParameter> DatalogFileToCmdParameter(DatalogFile datalogFile)
         {
-            var list = new List<SQLiteParameter>
+            var list = new List<FbParameter>
             {
-                new SQLiteParameter("@id", datalogFile.Id.ToString()),
-                new SQLiteParameter("@fileName", datalogFile.FileName),
-                new SQLiteParameter("@lastRowIndex", datalogFile.LastRowIndex),
-                new SQLiteParameter("@lastMarkCount", datalogFile.LastMarkCount)
+                new FbParameter("@id",FbDbType.VarChar ,38){Value= datalogFile.Id.ToString()},
+                new FbParameter("@fileName",FbDbType.VarChar ,300){Value =datalogFile.FileName },
+                new FbParameter("@lastRowIndex",FbDbType.Integer){Value =datalogFile.LastRowIndex },
+                new FbParameter("@lastMarkCount",FbDbType.Integer){Value =datalogFile.LastMarkCount}
             };
 
             return list;
         }
 
-        public static DatalogFile GetDatalogFileByFileName(string databaseFile, string datalogFileName)
+        public static async Task<TransactionResult> GetDatalogFileByFileName(string datalogFileName, string databaseFile = DbFileName)
         {
-            DatalogFile df = new DatalogFile();
-            df.Id = Guid.NewGuid();
-            df.FileName = datalogFileName;
+            var df = new DatalogFile
+            {
+                Id = Guid.NewGuid(),
+                FileName = datalogFileName
+            };
 
             var path = Path.GetFullPath(databaseFile);
-            if (!File.Exists(path)) return df;
+            if (!File.Exists(path)) return TransactionResult.Create(true, df);
 
             try
             {
-
-
-                var con = new SQLiteConnection($"Data Source={path};Version=3;");
+                var con = new FbConnection(Database);
                 con.Open();
 
-                var cmd = new SQLiteCommand("SELECT * FROM DatalogFiles Where FileName=@fileName",con);
+                var cmd = new FbCommand("SELECT * FROM DatalogFiles Where FileName=@fileName", con);
                 var cmdParam = DatalogFileToCmdParameter(df);
-                cmd.Parameters.AddRange(cmdParam.ToArray());
-                cmd.Prepare();
+                cmd.Parameters.AddRange(cmdParam);
+                await cmd.PrepareAsync();
 
-                var rdr = cmd.ExecuteReader();
+                var rdr = await cmd.ExecuteReaderAsync();
                 if (rdr.HasRows)
                 {
-                    rdr.Read();
-
-
-                    df.Id = rdr.GetGuid(0);
-                    df.FileName = rdr.GetString(1);
-                    df.LastRowIndex = rdr.GetInt32(2);
-                    df.LastMarkCount = rdr.GetInt32(3);
+                    if(rdr.Read())
+                    {
+                        df.Id = Guid.Parse($"{{{rdr.GetString(0)}}}");
+                        df.FileName = rdr.GetString(1);
+                        df.LastRowIndex = rdr.GetInt32(2);
+                        df.LastMarkCount = rdr.GetInt32(3);
+                    }
                 }
-                con.Close();
+                await con.CloseAsync();
+                return TransactionResult.Create(true, df);
             }
-            catch
+            catch (FbException exception)
             {
-
+                return TransactionResult.Create(false, exception, exception.ErrorCode, exception.Message);
             }
-            return df;
-      
+            catch (Exception exception)
+            {
+                return TransactionResult.Create(false, exception, -1, exception.Message);
+            }
         }
-        public static DatalogFile GetDatalogFileById(string databaseFile, Guid identity)
+        public static async Task<TransactionResult> GetDatalogFileById(Guid identity, string databaseFile = DbFileName)
         {
            
             DatalogFile df = new DatalogFile
@@ -209,40 +210,43 @@ namespace LaserPrinting.Model
             };
 
             var path = Path.GetFullPath(databaseFile);
-            if (!File.Exists(path)) return df;
+            if (!File.Exists(path)) return TransactionResult.Create(true, df);
 
             try
             {
 
-
-                var con = new SQLiteConnection($"Data Source={path};Version=3;");
+                var con = new FbConnection(Database);
                 con.Open();
 
-                var cmd = new SQLiteCommand("SELECT * FROM DatalogFiles Where Id=@id",con);
+                var cmd = new FbCommand("SELECT * FROM DatalogFiles Where DatalogFiles.Id=@id", con);
                 var cmdParam = DatalogFileToCmdParameter(df);
-                cmd.Parameters.AddRange(cmdParam.ToArray());
-                cmd.Prepare();
+                cmd.Parameters.AddRange(cmdParam);
+                await cmd.PrepareAsync();
 
-                var rdr = cmd.ExecuteReader();
+                var rdr = await cmd.ExecuteReaderAsync();
                 if (rdr.HasRows)
                 {
-                    rdr.Read();
-
-
-                    df.Id = rdr.GetGuid(0);
-                    df.FileName = rdr.GetString(1);
-                    df.LastRowIndex = rdr.GetInt32(2);
-                    df.LastMarkCount = rdr.GetInt32(3);
-                    con.Close();
-                    return df;
+                    if (rdr.Read())
+                    {
+                        df.Id = Guid.Parse($"{{{rdr.GetString(0)}}}");
+                        df.FileName = rdr.GetString(1);
+                        df.LastRowIndex = rdr.GetInt32(2);
+                        df.LastMarkCount = rdr.GetInt32(3);
+                        await con.CloseAsync();
+                        return TransactionResult.Create(true, df);
+                    }
                 }
-                con.Close();
+                await con.CloseAsync();
+                return TransactionResult.Create(true);
             }
-            catch
+            catch (FbException exception)
             {
-
+                return TransactionResult.Create(false, exception, exception.ErrorCode, exception.Message);
             }
-            return null;
+            catch (Exception exception)
+            {
+                return TransactionResult.Create(false, exception, -1, exception.Message);
+            }
         }
     }
 }
