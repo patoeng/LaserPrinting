@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ComponentFactory.Krypton.Toolkit;
@@ -28,10 +29,17 @@ namespace LaserPrinting
         #endregion
         public MainAuto()
         {
-            InitializeComponent();
-            InitLaserPrinting();
-            InitFileWatcher();
-            InitSetting();
+            try
+            {
+                InitializeComponent();
+                InitLaserPrinting();
+                InitFileWatcher();
+                InitSetting();
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(DateTime.Now.ToString("yyyymmddss"),ex.Source +" "+ex.Message);
+            }
         }
         public void InitLaserPrinting()
         {
@@ -147,7 +155,7 @@ namespace LaserPrinting
                         {
                             _mesData.SetManufacturingOrder(mfg);
                             ClearTextBox();
-                            MessageBox.Show("Incorrect Product Work Flow!");
+                            MessageBox.Show(@"Incorrect Product Work Flow!");
                             return;
                         }
 
@@ -217,16 +225,37 @@ namespace LaserPrinting
                     return "Manufacturing Order And Container Name is Needed!";
 
                 var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode,(string) _mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name, Tb_MfgWorkflow.Text, Tb_MfgUOM.Text, product.PrintedStartDateTime);
-                var resultMoveIn = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
-                if (!resultStart || !resultMoveIn) return "Container failed to Start and Move In";
+                if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
+
+                var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
+                if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                {
+                    transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                    resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
+                    if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                    {
+                        transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                        resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
+                    }
+                }
+                if (!resultMoveIn) return $"Container failed Move In. {transaction.Result}";
+
 
                 var cDataPoint = new DataPointDetails[1];
                 cDataPoint[0] = new DataPointDetails { DataName = "Article Number", DataValue= !string.IsNullOrEmpty(product.ArticleNumber) ? product.ArticleNumber : "NA", DataType = DataTypeEnum.String };
 
-                var resultMoveStd =
-                    await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
-                return resultMoveStd ? "Container success to Start, MoveIn and Moved Std" : "Container success to Start and MoveIn but failed to Moved Std";
-
+                
+                var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                {
+                    resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                    if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                    {
+                        resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                    }
+                }
+                return resultMoveStd.Result ? "Container success to Start, MoveIn and Moved Std" : $"Container success to Start and MoveIn but failed to Moved Std. {resultMoveStd.Message}";
             }
             catch (Exception ex)
             {
@@ -239,7 +268,7 @@ namespace LaserPrinting
 
         private void RealtimeMfg_Click(object sender, EventArgs e)
         {
-            if (RealtimeMfg.Checked == true)
+            if (RealtimeMfg.Checked)
             {
                 Tb_MfgOrder.Enabled = false;
                 Tb_MfgOrder.StateCommon.Content.Color1 = Color.Gray;

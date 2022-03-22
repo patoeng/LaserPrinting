@@ -733,7 +733,7 @@ namespace LaserPrinting
             // kryptonGroupBox1
             // 
             this.kryptonGroupBox1.Location = new System.Drawing.Point(12, 451);
-            this.kryptonGroupBox1.Margin = new System.Windows.Forms.Padding(2);
+            this.kryptonGroupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.kryptonGroupBox1.Name = "kryptonGroupBox1";
             this.kryptonGroupBox1.Palette = this.LaserPrintingPalette;
             this.kryptonGroupBox1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
@@ -750,7 +750,7 @@ namespace LaserPrinting
             // Tb_Message
             // 
             this.Tb_Message.Location = new System.Drawing.Point(6, 160);
-            this.Tb_Message.Margin = new System.Windows.Forms.Padding(2);
+            this.Tb_Message.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Tb_Message.Multiline = true;
             this.Tb_Message.Name = "Tb_Message";
             this.Tb_Message.Palette = this.LaserPrintingPalette;
@@ -778,7 +778,7 @@ namespace LaserPrinting
             this.kryptonDataGridView1.Name = "kryptonDataGridView1";
             this.kryptonDataGridView1.ReadOnly = true;
             this.kryptonDataGridView1.RowHeadersWidth = 51;
-            this.kryptonDataGridView1.Size = new System.Drawing.Size(736, 137);
+            this.kryptonDataGridView1.Size = new System.Drawing.Size(736, 122);
             this.kryptonDataGridView1.StateCommon.Background.Color1 = System.Drawing.Color.White;
             this.kryptonDataGridView1.StateCommon.Background.Color2 = System.Drawing.Color.White;
             this.kryptonDataGridView1.StateCommon.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
@@ -910,7 +910,7 @@ namespace LaserPrinting
             // 
             this.btnResourceSetup.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnResourceSetup.Location = new System.Drawing.Point(593, 3);
-            this.btnResourceSetup.Margin = new System.Windows.Forms.Padding(4);
+            this.btnResourceSetup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnResourceSetup.Name = "btnResourceSetup";
             this.btnResourceSetup.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(184)))), ((int)(((byte)(116)))));
             this.btnResourceSetup.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(143)))), ((int)(((byte)(81)))));
@@ -973,7 +973,7 @@ namespace LaserPrinting
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(252)))), ((int)(((byte)(252)))));
-            this.ClientSize = new System.Drawing.Size(1010, 783);
+            this.ClientSize = new System.Drawing.Size(1014, 902);
             this.Controls.Add(this.btnResourceSetup);
             this.Controls.Add(this.Lb_ContainerList);
             this.Controls.Add(this.MfgContainerLabel);
@@ -983,7 +983,7 @@ namespace LaserPrinting
             this.Controls.Add(this.MyTitle);
             this.Controls.Add(this.kryptonGroup1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "MainAuto";
             this.Palette = this.LaserPrintingPalette;
             this.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;

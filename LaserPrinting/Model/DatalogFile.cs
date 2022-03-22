@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
 using System.Data.SQLite;
+using System.IO;
+using System.Globalization;
 
 namespace LaserPrinting.Model
 {
@@ -38,7 +35,7 @@ namespace LaserPrinting.Model
                 }
                 if (str.Contains("the MarkCode:"))// mark indicator, get barcode, date start, and mark count
                 {
-                    //get date
+                   // get date
                     DateTime dt;
                     var dateString = str.Substring(0, 23);
                     var tryDate = DateTime.TryParseExact(dateString, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
@@ -47,7 +44,7 @@ namespace LaserPrinting.Model
                     //get barcode
                     var barcodeString = str.Substring(str.IndexOf("Code:") + 5, 19);
 
-                    //get Mark Count
+                   // get Mark Count
                     //var markCount = str.Substring(str.IndexOf("Count:") + 6, str.IndexOf(",Marking") - str.IndexOf("Count:") - 6);
 
                     var product = new LaserPrintingProduct
@@ -89,20 +86,20 @@ namespace LaserPrinting.Model
 
                 var con = new SQLiteConnection($"Data Source={path};Version=3;");
                 con.Open();
-           
 
-                var cmd = new SQLiteCommand(con);
+
+                
                 var dataExist = GetDatalogFileById(databaseFile, datalogFile.Id);
-
+                var commandText = "";
                 if (dataExist == null) //insert new if null
                 {
-                    cmd.CommandText = "INSERT INTO DatalogFiles (Id,FileName,LastRowIndex,LastMarkCount) VALUES(@id,@fileName,@lastRowIndex,@lastMarkCount)";
+                    commandText = "INSERT INTO DatalogFiles (Id,FileName,LastRowIndex,LastMarkCount) VALUES(@id,@fileName,@lastRowIndex,@lastMarkCount)";
                 }
                 else //update
                 {
-                    cmd.CommandText = "UPDATE DatalogFiles SET FileName=@fileName, LastRowIndex=@lastRowIndex,LastMarkCount=@lastMarkCount WHERE id=@id";
+                    commandText = "UPDATE DatalogFiles SET FileName=@fileName, LastRowIndex=@lastRowIndex,LastMarkCount=@lastMarkCount WHERE id=@id";
                 }
-
+                var cmd = new SQLiteCommand(commandText,con);
                 var cmdParam = DatalogFileToCmdParameter(datalogFile);
                 cmd.Parameters.AddRange(cmdParam.ToArray());
                 cmd.Prepare();
@@ -111,34 +108,34 @@ namespace LaserPrinting.Model
                 con.Close();
                 return true;
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return false;
             }
-            
+           
+
         }
         public static bool CreateDatabaseFile(string databaseFile)
         {
             //Check if database file exist, try create if not exist.
             if (File.Exists(databaseFile)) return true;
 
+           
 
             try
             {
                 var path = Path.GetFullPath(databaseFile);
                 SQLiteConnection.CreateFile(path);
 
-
+                File.WriteAllBytes(path,Array.Empty<byte>());
                 var con = new SQLiteConnection($"Data Source={path};Version=3;");
-
                 con.Open();
 
-                var cmd = new SQLiteCommand(con);
+               
 
-                cmd.CommandText = "DROP TABLE IF EXISTS DatalogFiles";
+                var cmd = new SQLiteCommand("DROP TABLE IF EXISTS DatalogFiles",con);
                 cmd.ExecuteNonQuery();
-
-                cmd.CommandText = @"CREATE TABLE DatalogFiles(id string PRIMARY KEY,FileName TEXT, LastRowIndex INT, LastMarkCount INT)";
+                cmd = new SQLiteCommand(@"CREATE TABLE DatalogFiles(id string PRIMARY KEY,FileName TEXT, LastRowIndex INT, LastMarkCount INT)", con);
                 cmd.ExecuteNonQuery();
                 con.Close();
                 return true;
@@ -147,6 +144,7 @@ namespace LaserPrinting.Model
             {
                 return false;
             }
+          
         }
         public static List<SQLiteParameter> DatalogFileToCmdParameter(DatalogFile datalogFile)
         {
@@ -172,13 +170,12 @@ namespace LaserPrinting.Model
 
             try
             {
-               
+
 
                 var con = new SQLiteConnection($"Data Source={path};Version=3;");
                 con.Open();
 
-                var cmd = new SQLiteCommand(con);
-                cmd.CommandText = "SELECT * FROM DatalogFiles Where FileName=@fileName";
+                var cmd = new SQLiteCommand("SELECT * FROM DatalogFiles Where FileName=@fileName",con);
                 var cmdParam = DatalogFileToCmdParameter(df);
                 cmd.Parameters.AddRange(cmdParam.ToArray());
                 cmd.Prepare();
@@ -198,12 +195,14 @@ namespace LaserPrinting.Model
             }
             catch
             {
-               
+
             }
             return df;
+      
         }
         public static DatalogFile GetDatalogFileById(string databaseFile, Guid identity)
         {
+           
             DatalogFile df = new DatalogFile
             {
                 Id = identity
@@ -219,8 +218,7 @@ namespace LaserPrinting.Model
                 var con = new SQLiteConnection($"Data Source={path};Version=3;");
                 con.Open();
 
-                var cmd = new SQLiteCommand(con);
-                cmd.CommandText = "SELECT * FROM DatalogFiles Where Id=@id";
+                var cmd = new SQLiteCommand("SELECT * FROM DatalogFiles Where Id=@id",con);
                 var cmdParam = DatalogFileToCmdParameter(df);
                 cmd.Parameters.AddRange(cmdParam.ToArray());
                 cmd.Prepare();
@@ -242,7 +240,7 @@ namespace LaserPrinting.Model
             }
             catch
             {
-                
+
             }
             return null;
         }
