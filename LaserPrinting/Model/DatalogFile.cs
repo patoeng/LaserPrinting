@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using MesData;
+using MesData.LaserMarking;
 
 namespace LaserPrinting.Model
 {
@@ -19,6 +21,9 @@ namespace LaserPrinting.Model
         public const string DbFileName = "DatalogFile.FDB";
         public static List<LaserPrintingProduct> FileParse(ref DatalogFile datalogFile)
         {
+            var laserDataConfig = LaserMarkingDataConfig.Load(LaserMarkingDataConfig.FileName);
+            laserDataConfig.SaveToFile();
+
             if (!File.Exists(datalogFile.FileName))
             {
                 datalogFile = null;
@@ -36,49 +41,24 @@ namespace LaserPrinting.Model
 
             var textSplit = text.Split('\n');
             
-            var index = 0;
+            var index = -1;
             var data = new List<LaserPrintingProduct>();
-            var markCount = 0;
-            foreach (var stri in textSplit)
+            foreach (var stringLine in textSplit)
             {
-                var str = stri.Trim();
-                if (string.IsNullOrEmpty(str))
+                index++;
+                var valid = LaserMarkingDataConfig.KeywordStrings.Aggregate(true, (current, configKeywordString) => current & stringLine.Contains(configKeywordString));
+                if(!valid)continue;
+
+                if (!(index>datalogFile.LastRowIndex)) continue;
+                
+                var laserDataPoint = LaserMarkingData.ParseData(stringLine, laserDataConfig);
+                if (laserDataPoint != null)
                 {
-                    index++;
-                    continue;
-                }
-                if (str.Contains("the MarkCode:"))// mark indicator, get barcode, date start, and mark count
-                {
-                   // get date
-                   var dateString = str.Substring(0, 23);
-                    var tryDate = DateTime.TryParseExact(dateString, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt);
-                    if (!tryDate) continue;
-
-                    //get barcode
-                    var barcodeString = str.Substring(str.IndexOf("Code:", StringComparison.Ordinal) + 5, 19);
-
-                    var product = new LaserPrintingProduct
-                    {
-                        DatalogFileId = datalogFile.Id,
-                        Barcode = barcodeString,
-                        PrintedStartDateTime = dt,
-                        PrintedEndDateTime = dt,
-                        ArticleNumber = ""
-                    };
-                    markCount++;
-                    product.MarkCount = markCount;
-
-                    if (product.MarkCount > datalogFile.LastMarkCount)
-                    {
-                        data.Add(product);
-                        datalogFile.LastMarkCount = product.MarkCount;
-                    }
+                    var laserProduct = new LaserPrintingProduct(laserDataPoint);
+                    data.Add(laserProduct);
                 }
 
                 datalogFile.LastRowIndex = index;
-
-                index++;
-
             }
             return data;
         }

@@ -1,18 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+using MesData.LaserMarking;
 
 namespace LaserPrinting.Model
 {
     public class LaserPrintingProduct
     {
-        public string Barcode { get; set; }
-        public DateTime PrintedEndDateTime { get; set; }
-        public DateTime PrintedStartDateTime { get; set; }
-        public int MarkCount { get; set; }
-        public Guid DatalogFileId { get; set; }
-        public string ArticleNumber { get; set; }
+        public LaserPrintingProduct(LaserMarkingData data)
+        {
+            Barcode = data.Barcode.Value;
+            ArticleNumber = data.ArticleNumber.Value;
+            LaserMarkingData = data;
+            DateTime.TryParseExact(data.PrintedDateTime.Value, LaserMarkingDataConfig.DateTimeStringFormat,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime tempDateTime);
+            PrintedDateTime = tempDateTime;
+        }
+        public string Barcode { get; protected set; }
+        public DateTime PrintedDateTime { get; protected set; }
+        public LaserMarkingData LaserMarkingData { get; protected set; }
+        public string ArticleNumber { get; protected set; }
     }
 }

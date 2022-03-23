@@ -68,15 +68,13 @@ namespace LaserPrinting
             this.kryptonGroupBox1 = new ComponentFactory.Krypton.Toolkit.KryptonGroupBox();
             this.Tb_Message = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.kryptonDataGridView1 = new ComponentFactory.Krypton.Toolkit.KryptonDataGridView();
-            this.barcodeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.printedEndDateTimeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.printedStartDateTimeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.markCountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.datalogFileIdDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.laserPrintingProductBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.Lb_ContainerList = new ComponentFactory.Krypton.Toolkit.KryptonListBox();
             this.MfgContainerLabel = new System.Windows.Forms.Label();
             this.btnResourceSetup = new ComponentFactory.Krypton.Toolkit.KryptonButton();
+            this.barcodeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ArticleNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PrintedDateTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.ResourceGrouping)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResourceGrouping.Panel)).BeginInit();
             this.ResourceGrouping.Panel.SuspendLayout();
@@ -733,7 +731,7 @@ namespace LaserPrinting
             // kryptonGroupBox1
             // 
             this.kryptonGroupBox1.Location = new System.Drawing.Point(12, 451);
-            this.kryptonGroupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonGroupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonGroupBox1.Name = "kryptonGroupBox1";
             this.kryptonGroupBox1.Palette = this.LaserPrintingPalette;
             this.kryptonGroupBox1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
@@ -750,7 +748,7 @@ namespace LaserPrinting
             // Tb_Message
             // 
             this.Tb_Message.Location = new System.Drawing.Point(6, 160);
-            this.Tb_Message.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Tb_Message.Margin = new System.Windows.Forms.Padding(2);
             this.Tb_Message.Multiline = true;
             this.Tb_Message.Name = "Tb_Message";
             this.Tb_Message.Palette = this.LaserPrintingPalette;
@@ -769,10 +767,8 @@ namespace LaserPrinting
             this.kryptonDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.kryptonDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.barcodeDataGridViewTextBoxColumn,
-            this.printedEndDateTimeDataGridViewTextBoxColumn,
-            this.printedStartDateTimeDataGridViewTextBoxColumn,
-            this.markCountDataGridViewTextBoxColumn,
-            this.datalogFileIdDataGridViewTextBoxColumn});
+            this.ArticleNumber,
+            this.PrintedDateTime});
             this.kryptonDataGridView1.DataSource = this.laserPrintingProductBindingSource;
             this.kryptonDataGridView1.Location = new System.Drawing.Point(6, 18);
             this.kryptonDataGridView1.Name = "kryptonDataGridView1";
@@ -811,52 +807,6 @@ namespace LaserPrinting
             | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.kryptonDataGridView1.StateNormal.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
             this.kryptonDataGridView1.TabIndex = 65;
-            // 
-            // barcodeDataGridViewTextBoxColumn
-            // 
-            this.barcodeDataGridViewTextBoxColumn.DataPropertyName = "Barcode";
-            this.barcodeDataGridViewTextBoxColumn.HeaderText = "Serial Number";
-            this.barcodeDataGridViewTextBoxColumn.MinimumWidth = 10;
-            this.barcodeDataGridViewTextBoxColumn.Name = "barcodeDataGridViewTextBoxColumn";
-            this.barcodeDataGridViewTextBoxColumn.ReadOnly = true;
-            this.barcodeDataGridViewTextBoxColumn.Width = 200;
-            // 
-            // printedEndDateTimeDataGridViewTextBoxColumn
-            // 
-            this.printedEndDateTimeDataGridViewTextBoxColumn.DataPropertyName = "PrintedEndDateTime";
-            this.printedEndDateTimeDataGridViewTextBoxColumn.HeaderText = "Printed End DateTime";
-            this.printedEndDateTimeDataGridViewTextBoxColumn.MinimumWidth = 10;
-            this.printedEndDateTimeDataGridViewTextBoxColumn.Name = "printedEndDateTimeDataGridViewTextBoxColumn";
-            this.printedEndDateTimeDataGridViewTextBoxColumn.ReadOnly = true;
-            this.printedEndDateTimeDataGridViewTextBoxColumn.Width = 200;
-            // 
-            // printedStartDateTimeDataGridViewTextBoxColumn
-            // 
-            this.printedStartDateTimeDataGridViewTextBoxColumn.DataPropertyName = "PrintedStartDateTime";
-            this.printedStartDateTimeDataGridViewTextBoxColumn.HeaderText = "Printed Start DateTime";
-            this.printedStartDateTimeDataGridViewTextBoxColumn.MinimumWidth = 10;
-            this.printedStartDateTimeDataGridViewTextBoxColumn.Name = "printedStartDateTimeDataGridViewTextBoxColumn";
-            this.printedStartDateTimeDataGridViewTextBoxColumn.ReadOnly = true;
-            this.printedStartDateTimeDataGridViewTextBoxColumn.Width = 200;
-            // 
-            // markCountDataGridViewTextBoxColumn
-            // 
-            this.markCountDataGridViewTextBoxColumn.DataPropertyName = "MarkCount";
-            this.markCountDataGridViewTextBoxColumn.HeaderText = "Mark Count";
-            this.markCountDataGridViewTextBoxColumn.MinimumWidth = 10;
-            this.markCountDataGridViewTextBoxColumn.Name = "markCountDataGridViewTextBoxColumn";
-            this.markCountDataGridViewTextBoxColumn.ReadOnly = true;
-            this.markCountDataGridViewTextBoxColumn.Width = 200;
-            // 
-            // datalogFileIdDataGridViewTextBoxColumn
-            // 
-            this.datalogFileIdDataGridViewTextBoxColumn.DataPropertyName = "DatalogFileId";
-            this.datalogFileIdDataGridViewTextBoxColumn.HeaderText = "DatalogFileId";
-            this.datalogFileIdDataGridViewTextBoxColumn.MinimumWidth = 10;
-            this.datalogFileIdDataGridViewTextBoxColumn.Name = "datalogFileIdDataGridViewTextBoxColumn";
-            this.datalogFileIdDataGridViewTextBoxColumn.ReadOnly = true;
-            this.datalogFileIdDataGridViewTextBoxColumn.Visible = false;
-            this.datalogFileIdDataGridViewTextBoxColumn.Width = 200;
             // 
             // laserPrintingProductBindingSource
             // 
@@ -910,7 +860,7 @@ namespace LaserPrinting
             // 
             this.btnResourceSetup.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnResourceSetup.Location = new System.Drawing.Point(593, 3);
-            this.btnResourceSetup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnResourceSetup.Margin = new System.Windows.Forms.Padding(4);
             this.btnResourceSetup.Name = "btnResourceSetup";
             this.btnResourceSetup.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(184)))), ((int)(((byte)(116)))));
             this.btnResourceSetup.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(143)))), ((int)(((byte)(81)))));
@@ -968,6 +918,30 @@ namespace LaserPrinting
             this.btnResourceSetup.Values.Text = "SETUP";
             this.btnResourceSetup.Click += new System.EventHandler(this.btnResourceSetup_Click);
             // 
+            // barcodeDataGridViewTextBoxColumn
+            // 
+            this.barcodeDataGridViewTextBoxColumn.DataPropertyName = "Barcode";
+            this.barcodeDataGridViewTextBoxColumn.HeaderText = "Serial Number";
+            this.barcodeDataGridViewTextBoxColumn.MinimumWidth = 10;
+            this.barcodeDataGridViewTextBoxColumn.Name = "barcodeDataGridViewTextBoxColumn";
+            this.barcodeDataGridViewTextBoxColumn.ReadOnly = true;
+            this.barcodeDataGridViewTextBoxColumn.Width = 200;
+            // 
+            // ArticleNumber
+            // 
+            this.ArticleNumber.DataPropertyName = "ArticleNumber";
+            this.ArticleNumber.HeaderText = "Article Number";
+            this.ArticleNumber.Name = "ArticleNumber";
+            this.ArticleNumber.ReadOnly = true;
+            // 
+            // PrintedDateTime
+            // 
+            this.PrintedDateTime.DataPropertyName = "PrintedDateTime";
+            this.PrintedDateTime.HeaderText = "Printed Date Time";
+            this.PrintedDateTime.Name = "PrintedDateTime";
+            this.PrintedDateTime.ReadOnly = true;
+            this.PrintedDateTime.Width = 300;
+            // 
             // MainAuto
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -983,7 +957,7 @@ namespace LaserPrinting
             this.Controls.Add(this.MyTitle);
             this.Controls.Add(this.kryptonGroup1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MainAuto";
             this.Palette = this.LaserPrintingPalette;
             this.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
@@ -1059,12 +1033,14 @@ namespace LaserPrinting
         private ComponentFactory.Krypton.Toolkit.KryptonListBox Lb_ContainerList;
         private System.Windows.Forms.Label MfgContainerLabel;
         private System.Windows.Forms.BindingSource laserPrintingProductBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn barcodeDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn printedEndDateTimeDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn printedStartDateTimeDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn markCountDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn datalogFileIdDataGridViewTextBoxColumn;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_Message;
         private ComponentFactory.Krypton.Toolkit.KryptonButton btnResourceSetup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn barcodeDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArticleNumber;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PrintedDateTime;
     }
 }

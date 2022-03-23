@@ -154,7 +154,6 @@
       <DependentUpon>MainAuto.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\DatalogFile.cs" />
-    <Compile Include="Model\LaserPrintingMachine.cs" />
     <Compile Include="Model\LaserPrintingProduct.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

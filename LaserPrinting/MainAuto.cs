@@ -10,9 +10,7 @@ using LaserPrinting.Helpers;
 using LaserPrinting.Services;
 using OpcenterWikLibrary;
 using System.Reflection;
-using Camstar.WCF.ObjectStack;
 using MesData;
-using Path = Camstar.WCF.ObjectStack.Path;
 
 
 namespace LaserPrinting
@@ -231,26 +229,25 @@ namespace LaserPrinting
                 if (_mesData.ManufacturingOrder.Name == "" || product.Barcode == "")
                     return "Manufacturing Order And Container Name is Needed!";
 
-                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode,(string) _mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name, Tb_MfgWorkflow.Text, Tb_MfgUOM.Text, product.PrintedStartDateTime);
+                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode,(string) _mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name, Tb_MfgWorkflow.Text, Tb_MfgUOM.Text, product.PrintedDateTime);
                 if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
 
-                var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                 if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
                 {
-                    transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                    transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                     resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
                     {
-                        transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedStartDateTime);
+                        transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                         resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     }
                 }
                 if (!resultMoveIn) return $"Container failed Move In. {transaction.Result}";
 
 
-                var cDataPoint = new DataPointDetails[1];
-                cDataPoint[0] = new DataPointDetails { DataName = "Article Number", DataValue= !string.IsNullOrEmpty(product.ArticleNumber) ? product.ArticleNumber : "NA", DataType = DataTypeEnum.String };
+                var cDataPoint = product.LaserMarkingData.ToDataPointDetailsList().ToArray();
 
                 
                 var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
