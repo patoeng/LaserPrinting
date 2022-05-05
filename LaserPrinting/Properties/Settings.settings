@@ -12,7 +12,13 @@
       <Value Profile="(Default)">DatalogFile.db</Value>
     </Setting>
     <Setting Name="WorkFlow" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Minime Workflow</Value>
+      <Value Profile="(Default)">Ariel Workflow</Value>
+    </Setting>
+    <Setting Name="DummyQty" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="DataLocation" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">.\PO</Value>
     </Setting>
   </Settings>
 </SettingsFile>

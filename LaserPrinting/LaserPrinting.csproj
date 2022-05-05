@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;MiniMe</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Ariel</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -77,7 +77,7 @@
     </Reference>
     <Reference Include="Camstar.WCFClient, Version=8.3.7871.22573, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Camstar.WCFClient.dll</HintPath>
+      <HintPath>..\..\GitHub\GitHub\Camstar.WCFClient.dll</HintPath>
     </Reference>
     <Reference Include="Camstar.WCFClientBase, Version=8.3.7871.22573, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -97,7 +97,7 @@
     </Reference>
     <Reference Include="ComponentFactory.Krypton.Toolkit, Version=4.6.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\ComponentFactory.Krypton.Toolkit.dll</HintPath>
+      <HintPath>..\..\Krypton\Bin\ComponentFactory.Krypton.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="ComponentFactory.Krypton.Workspace, Version=4.6.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -110,8 +110,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\InSiteXMLClient.dll</HintPath>
     </Reference>
-    <Reference Include="OpcenterWikLibrary">
-      <HintPath>lib\OpcenterWikLibrary.dll</HintPath>
+    <Reference Include="OpcenterWikLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\GitHub\GitHub\OpcenterWikLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -153,13 +154,24 @@
     <Compile Include="MainAuto.Designer.cs">
       <DependentUpon>MainAuto.cs</DependentUpon>
     </Compile>
+    <Compile Include="MainAuto24.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainAuto24.Designer.cs">
+      <DependentUpon>MainAuto24.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\DatalogFile.cs" />
     <Compile Include="Model\LaserPrintingProduct.cs" />
+    <Compile Include="Model\LocalProductionOrder.cs" />
+    <Compile Include="Model\ProductionState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DatalogFileWatcher.cs" />
     <EmbeddedResource Include="MainAuto.resx">
       <DependentUpon>MainAuto.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainAuto24.resx">
+      <DependentUpon>MainAuto24.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -177,6 +189,7 @@
     <None Include="LaserPrinting_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\LaserPrinting.Model.LaserPrintingProduct.datasource" />
+    <None Include="Properties\DataSources\MesData.FinishedGood.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -210,6 +223,12 @@
       <Project>{47a21ecb-4762-4320-8946-4a7226c0085b}</Project>
       <Name>MesData</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\7070232300.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\7070235000.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

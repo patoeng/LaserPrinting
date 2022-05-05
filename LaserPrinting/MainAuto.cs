@@ -62,7 +62,7 @@ namespace LaserPrinting
             Text = Mes.AddVersionNumber(Text + " Ariel");
 #endif
 
-            _mesData = new Mes(name);
+            _mesData = new Mes(name, AppSettings.Resource);
 
             MyTitle.Text = $"Laser Printing - {AppSettings.Resource}";
             ResourceGrouping.Values.Heading = $"Resource Status: {AppSettings.Resource}";

@@ -18,7 +18,7 @@ namespace LaserPrinting
             AppSettings.AssemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainAuto());
+            Application.Run(new MainAuto24());
         }
     }
 }

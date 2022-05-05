@@ -52,10 +52,31 @@ namespace LaserPrinting.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Minime Workflow")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ariel Workflow")]
         public string WorkFlow {
             get {
                 return ((string)(this["WorkFlow"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int DummyQty {
+            get {
+                return ((int)(this["DummyQty"]));
+            }
+            set {
+                this["DummyQty"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\PO")]
+        public string DataLocation {
+            get {
+                return ((string)(this["DataLocation"]));
             }
         }
     }
