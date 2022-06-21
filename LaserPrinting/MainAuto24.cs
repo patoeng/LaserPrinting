@@ -21,7 +21,6 @@ namespace LaserPrinting
         private DatalogFileWatcher _watcher;
         private Mes _mesData;
         private string _productWorkflow;
-        private ProductionState _productionState;
         private LocalProductionOrder _currentPo;
         private string _dataLocalPo;
 
@@ -45,7 +44,7 @@ namespace LaserPrinting
             Text = Mes.AddVersionNumber(Text + " Ariel");
 #endif
 
-            _mesData = new Mes(name, AppSettings.Resource);
+            _mesData = new Mes(name, AppSettings.Resource,name);
 
             MyTitle.Text = @"Laser Printing";
             lblTitle.Text = AppSettings.Resource;
@@ -149,10 +148,12 @@ namespace LaserPrinting
                     }
                 }
                 //if (_mesData.ManufacturingOrder.isWorkflow != null) Tb_MfgWorkflow.Text = _mesData.ManufacturingOrder.isWorkflow.Name;
-                if (_mesData.ManufacturingOrder.UOM != null) Tb_MfgUOM.Text = _mesData.ManufacturingOrder.UOM.Name;
+                if (_mesData.ManufacturingOrder.Qty != null)
+                    Tb_MfgQty.Text = _mesData.ManufacturingOrder.Qty.ToString();
                 if (Convert.ToString(_mesData.ManufacturingOrder.PlannedStartDate) != "") Tb_MfgStartedDate.Text = Convert.ToString(_mesData.ManufacturingOrder.PlannedStartDate);
                 if (Convert.ToString(_mesData.ManufacturingOrder.PlannedCompletionDate) != "") Tb_MfgEndDate.Text = Convert.ToString(_mesData.ManufacturingOrder.PlannedCompletionDate);
-                
+               // if (Convert.ToString(_mesData.ManufacturingOrder.Product?.Name) != "") Tb_ArticleNumber.Text = Convert.ToString(_mesData.ManufacturingOrder.Product?.Name);
+
                 if (_mesData.ManufacturingOrder.Product != null)
                 {
                     var opecImage = await Mes.GetImage(_mesData, _mesData.ManufacturingOrder.Product.Name);
@@ -184,12 +185,13 @@ namespace LaserPrinting
 
                 if (product.PrintedDateTime < _mesData.ProductionDateStart) return "Container date is older than production date!";
                 if (product.PrintedDateTime > DateTime.Now) return "Container date is in the future!";
-                ThreadHelper.ControlSetText(tbSerialNumber, product.Barcode);
+              
                 ThreadHelper.ControlSetText(Tb_ArticleNumber,product.ArticleNumber);
+                ThreadHelper.ControlSetText(tbSerialNumber, product.Barcode);
                 ThreadHelper.ControlSetText(lbMoveIn, product.PrintedDateTime.ToString(Mes.DateTimeStringFormat));
                 ThreadHelper.ControlSetText(lbMoveOut, "");
 
-                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgUOM.Text, product.PrintedDateTime);
+                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgQty.Text, product.PrintedDateTime);
                 if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
 
                 var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
@@ -224,6 +226,9 @@ namespace LaserPrinting
                     ThreadHelper.ControlSetText(lbMoveOut, DateTime.Now.ToString(Mes.DateTimeStringFormat));
                     if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
                     {
+                        var cAttributes = new ContainerAttrDetail[1];
+                        cAttributes[0] = new ContainerAttrDetail { Name = MesContainerAttribute.LaserQualityMarkerInspect, DataType = TrivialTypeEnum.Integer, AttributeValue = $"QC_DUMMY_{_currentPo.ContainerList.Count}", IsExpression = false };
+                        var t = await Mes.ExecuteContainerAttrMaint(_mesData, product.Barcode, cAttributes);
                         _currentPo.ContainerList.Add(product.Barcode);
                         _currentPo.Save(_dataLocalPo);
                         if (_currentPo.ContainerList.Count >= _currentPo.DummyQty)
@@ -232,6 +237,7 @@ namespace LaserPrinting
                             await GetStatusOfResource();
                         }
                     }
+
 
                     await Mes.UpdateCounter(_mesData, 1);
                     var mfg = await Mes.GetMfgOrder(_mesData, _mesData.ManufacturingOrder.Name.ToString());
@@ -389,10 +395,10 @@ namespace LaserPrinting
             Tb_MfgOrder.Clear();
             Tb_MfgProduct.Clear();
             Tb_Description.Clear();
-            Tb_MfgUOM.Clear();
+            Tb_MfgQty.Clear();
             Tb_MfgStartedDate.Clear();
             Tb_MfgEndDate.Clear();
-            Tb_MfgUOM.Clear();
+            Tb_MfgQty.Clear();
             Tb_ArticleNumber.Clear();
             tbSerialNumber.Clear();
             lbMoveIn.Text = "";
@@ -456,7 +462,6 @@ namespace LaserPrinting
                     Tb_MfgOrder.Enabled = false;
                     break;
             }
-            _productionState = currentProductionState;
         }
         private async void TimerRealtime_Tick(object sender, EventArgs e)
         {
@@ -478,6 +483,7 @@ namespace LaserPrinting
             await GetStatusOfResource();
             await GetResourceStatusCodeList();
             await GetStatusMaintenanceDetails();
+          
         }
 
         private async void btnStartPreparation_Click(object sender, EventArgs e)
@@ -520,8 +526,17 @@ namespace LaserPrinting
 
         private async void btnFinishPreparation_Click(object sender, EventArgs e)
         {
-            if (_currentPo.ContainerList.Count < _currentPo.DummyQty) return;
-            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance") return;
+            if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
+            {
+                KryptonMessageBox.Show("Dummy quantity failed!");
+                return;
+            }
+
+            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance")
+            {
+                KryptonMessageBox.Show("CP under maintenance");
+                return;
+            }
             using (var ss = new LoginForm24())
             {
                 var dlg = ss.ShowDialog(this);
@@ -630,6 +645,8 @@ namespace LaserPrinting
             }
             if (kryptonNavigator1.SelectedIndex == 2)
             {
+                if (_currentPo==null)return;
+
                 kryptonDataGridView1.Rows.Clear();
                 foreach (var container in _currentPo.ContainerList)
                 {
@@ -640,7 +657,7 @@ namespace LaserPrinting
 
         private async Task GetFinishedGoodRecord()
         {
-            var data = await Mes.GetFinishGoodRecord(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+            var data = await Mes.GetFinishGoodRecord(_mesData, _mesData.ManufacturingOrder?.Name.ToString(),120000);
             if (data != null)
             {
                 var list = await Mes.ContainerStatusesToFinishedGood(data);

@@ -30,7 +30,7 @@ namespace LaserPrinting
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TemplateUI = new ComponentFactory.Krypton.Toolkit.KryptonPalette(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonPanel4 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
@@ -60,7 +60,7 @@ namespace LaserPrinting
             this.label4 = new System.Windows.Forms.Label();
             this.Tb_Description = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.Tb_MfgUOM = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
+            this.Tb_MfgQty = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.Tb_MfgProduct = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.Tb_MfgOrder = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
@@ -561,7 +561,7 @@ namespace LaserPrinting
             this.kryptonPanel7.Controls.Add(this.label4);
             this.kryptonPanel7.Controls.Add(this.Tb_Description);
             this.kryptonPanel7.Controls.Add(this.label3);
-            this.kryptonPanel7.Controls.Add(this.Tb_MfgUOM);
+            this.kryptonPanel7.Controls.Add(this.Tb_MfgQty);
             this.kryptonPanel7.Controls.Add(this.label2);
             this.kryptonPanel7.Controls.Add(this.Tb_MfgProduct);
             this.kryptonPanel7.Controls.Add(this.Tb_MfgOrder);
@@ -684,26 +684,26 @@ namespace LaserPrinting
             this.label3.TabIndex = 100;
             this.label3.Text = "Planned Qty :";
             // 
-            // Tb_MfgUOM
+            // Tb_MfgQty
             // 
-            this.Tb_MfgUOM.Enabled = false;
-            this.Tb_MfgUOM.Location = new System.Drawing.Point(47, 336);
-            this.Tb_MfgUOM.Name = "Tb_MfgUOM";
-            this.Tb_MfgUOM.Size = new System.Drawing.Size(325, 61);
-            this.Tb_MfgUOM.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.Tb_MfgUOM.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Tb_MfgUOM.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Tb_MfgUOM.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            this.Tb_MfgQty.Enabled = false;
+            this.Tb_MfgQty.Location = new System.Drawing.Point(47, 336);
+            this.Tb_MfgQty.Name = "Tb_MfgQty";
+            this.Tb_MfgQty.Size = new System.Drawing.Size(325, 61);
+            this.Tb_MfgQty.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.Tb_MfgQty.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Tb_MfgQty.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Tb_MfgQty.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
             | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
             | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.Tb_MfgUOM.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.Tb_MfgUOM.StateCommon.Border.Rounding = 30;
-            this.Tb_MfgUOM.StateCommon.Border.Width = 1;
-            this.Tb_MfgUOM.StateCommon.Content.Color1 = System.Drawing.Color.Gray;
-            this.Tb_MfgUOM.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F);
-            this.Tb_MfgUOM.StateCommon.Content.Padding = new System.Windows.Forms.Padding(7);
-            this.Tb_MfgUOM.TabIndex = 101;
-            this.Tb_MfgUOM.Text = "1200";
+            this.Tb_MfgQty.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.Tb_MfgQty.StateCommon.Border.Rounding = 30;
+            this.Tb_MfgQty.StateCommon.Border.Width = 1;
+            this.Tb_MfgQty.StateCommon.Content.Color1 = System.Drawing.Color.Gray;
+            this.Tb_MfgQty.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F);
+            this.Tb_MfgQty.StateCommon.Content.Padding = new System.Windows.Forms.Padding(7);
+            this.Tb_MfgQty.TabIndex = 101;
+            this.Tb_MfgQty.Text = "1200";
             // 
             // label2
             // 
@@ -1704,8 +1704,8 @@ namespace LaserPrinting
             this.kryptonDataGridView2.Palette = this.TemplateUI;
             this.kryptonDataGridView2.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
             this.kryptonDataGridView2.RowHeadersWidth = 51;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.Transparent;
-            this.kryptonDataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Transparent;
+            this.kryptonDataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this.kryptonDataGridView2.RowTemplate.Height = 40;
             this.kryptonDataGridView2.Size = new System.Drawing.Size(976, 598);
             this.kryptonDataGridView2.StateCommon.Background.Color1 = System.Drawing.Color.White;
@@ -1890,7 +1890,7 @@ namespace LaserPrinting
         private System.Windows.Forms.Label label4;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_Description;
         private System.Windows.Forms.Label label3;
-        private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_MfgUOM;
+        private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_MfgQty;
         private System.Windows.Forms.Label label2;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_MfgProduct;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_MfgOrder;

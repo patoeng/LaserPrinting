@@ -62,10 +62,10 @@ namespace LaserPrinting
             Text = Mes.AddVersionNumber(Text + " Ariel");
 #endif
 
-            _mesData = new Mes(name, AppSettings.Resource);
+            _mesData = new Mes(name, AppSettings.Resource,name);
 
-            MyTitle.Text = $"Laser Printing - {AppSettings.Resource}";
-            ResourceGrouping.Values.Heading = $"Resource Status: {AppSettings.Resource}";
+            MyTitle.Text = $@"Laser Printing - {AppSettings.Resource}";
+            ResourceGrouping.Values.Heading = $@"Resource Status: {AppSettings.Resource}";
 
         }
         private void InitFileWatcher()

@@ -32,7 +32,7 @@ namespace LaserPrinting.Services
             _fileSystemWatcher = new FileSystemWatcher
             {
                 Path = fileLocation,
-                NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
+                NotifyFilter =  NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
                 Filter = filePattern
             };
             _fileSystemWatcher.Changed += FileWatcherOnChanged;
@@ -43,7 +43,10 @@ namespace LaserPrinting.Services
         {
             if (Busy) return;
             Busy = true;
-            if (FileChangedDetected!=null) await FileChangedDetected?.Invoke(e.FullPath);
+            if (FileChangedDetected != null)
+            {
+                var s =await Task.Run(()=> FileChangedDetected?.Invoke(e.FullPath)) ;
+            }
             Busy = false;
         }
     }
