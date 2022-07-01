@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -35,13 +36,13 @@ namespace LaserPrinting
         }
         public void InitLaserPrinting()
         {
-         
+
 #if MiniMe
             var name = "Laser Marking Minime";
-            Text = Mes.AddVersionNumber(Text + " MiniMe");
+             Text = Mes.AddVersionNumber(name);
 #elif Ariel
-            var  name = "Laser Marking Ariel";
-            Text = Mes.AddVersionNumber(Text + " Ariel");
+            var name = "Laser Marking Ariel";
+            Text = Mes.AddVersionNumber(name);
 #endif
 
             _mesData = new Mes(name, AppSettings.Resource,name);
@@ -49,10 +50,11 @@ namespace LaserPrinting
             MyTitle.Text = @"Laser Printing";
             lblTitle.Text = AppSettings.Resource;
             kryptonNavigator1.SelectedIndex = 0;
+            EventLogUtil.LogEvent("Application Start");
         }
         private void InitFileWatcher()
         {
-            var setting = new Properties.Settings();
+            var setting = new Settings();
             _watcher = new DatalogFileWatcher(setting.LaserDatalogLocation, setting.LaserDatalogPattern);
             _watcher.FileChangedDetected += DatalogParserMethod;
         }
@@ -61,6 +63,7 @@ namespace LaserPrinting
             var setting = new Settings();
             _productWorkflow = setting.WorkFlow;
             Tb_DummyQty.Value = setting.DummyQty;
+            Tb_TimeOffset.Value =(decimal) setting.TimeOffset;
         }
 
      
@@ -68,17 +71,14 @@ namespace LaserPrinting
         {
             var fileNewPath = fileLocation.Replace('\\', '/');
            // ThreadHelper.ControlSetText(Tb_Message, "");
-           if (_mesData.ManufacturingOrder == null)
-           {
-                //ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing --->[{fileLocation}] Canceled, Invalid Manufacturing Order.");
+            if (_mesData.ManufacturingOrder == null)
+            {
                return false;
             }
             if (_mesData.ResourceStatusDetails == null || _mesData.ResourceStatusDetails?.Availability != "Up")
             {
-               // ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing --->[{fileLocation}] Canceled, Resource is not in \"Up\" condition.");
                 return false;
             }
-            //ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}");
 
             var result = await DatalogFile.GetDatalogFileByFileName(fileNewPath);
             if (!result.Result) return false;
@@ -95,9 +95,7 @@ namespace LaserPrinting
             foreach (var sn in list)
             {
                 var s = await StartMoveInMove(sn);
-               // ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :[{sn.Barcode}] ---> {s}");
             }
-            //ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}... Done");
             return true;
         }
 
@@ -124,6 +122,7 @@ namespace LaserPrinting
                 _currentPo = LocalProductionOrder.Load(_dataLocalPo);
                 _currentPo.ProductionOrder = _mesData.ManufacturingOrder.Name.ToString();
                 _currentPo.DummyQty = setting.DummyQty;
+                _currentPo.TimeOffset = setting.TimeOffset;
                 _currentPo.Save();
 
                 if (_mesData.ManufacturingOrder.Name.ToString() != "") Tb_MfgOrder.Text = _mesData.ManufacturingOrder.Name.ToString();
@@ -185,45 +184,56 @@ namespace LaserPrinting
 
                 if (product.PrintedDateTime < _mesData.ProductionDateStart) return "Container date is older than production date!";
                 if (product.PrintedDateTime > DateTime.Now) return "Container date is in the future!";
-              
+
+                var dMoveIn = product.PrintedDateTime.AddHours(_currentPo.TimeOffset);
                 ThreadHelper.ControlSetText(Tb_ArticleNumber,product.ArticleNumber);
                 ThreadHelper.ControlSetText(tbSerialNumber, product.Barcode);
-                ThreadHelper.ControlSetText(lbMoveIn, product.PrintedDateTime.ToString(Mes.DateTimeStringFormat));
+                ThreadHelper.ControlSetText(lbMoveIn, dMoveIn.ToString(Mes.DateTimeStringFormat));
                 ThreadHelper.ControlSetText(lbMoveOut, "");
 
-                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgQty.Text, product.PrintedDateTime);
+                var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgQty.Text, dMoveIn);
                 if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
 
-                var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
+                var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                 if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
                 {
-                    transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
+                    transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                     resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
                     {
-                        transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
+                        transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                         resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     }
                 }
-                if (!resultMoveIn) return $"Container failed Move In. {transaction.Result}";
 
+                if (!resultMoveIn)
+                {// check if fail by maintenance Past Due
+                    var transPastDue = Mes.GetMaintenancePastDue(_mesData.MaintenanceStatusDetails);
+                    if (transPastDue.Result)
+                    {
+                        KryptonMessageBox.Show(this, "This resource under maintenance, need to complete!", "Move In",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    return $"Container failed Move In. {transaction.Result}";
+                }
 
+                var dMoveOut = DateTime.Now.AddHours(_currentPo.TimeOffset);
                 var cDataPoint = product.LaserMarkingData.ToDataPointDetailsList().ToArray();
 
-                var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
                 if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
                 {
-                    resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                    resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
                     if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
                     {
-                        resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
+                        resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
                     }
                 }
 
                 if (resultMoveStd.Result)
                 {
-                    ThreadHelper.ControlSetText(lbMoveOut, DateTime.Now.ToString(Mes.DateTimeStringFormat));
+                    ThreadHelper.ControlSetText(lbMoveOut, dMoveOut.ToString(Mes.DateTimeStringFormat));
                     if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
                     {
                         var cAttributes = new ContainerAttrDetail[1];
@@ -336,6 +346,7 @@ namespace LaserPrinting
                 var maintenanceStatusDetails = await Mes.GetMaintenanceStatusDetails(_mesData);
                 if (maintenanceStatusDetails != null)
                 {
+                    _mesData.SetMaintenanceStatusDetails(maintenanceStatusDetails);
                     Dg_Maintenance.DataSource = maintenanceStatusDetails;
                     Dg_Maintenance.Columns["Due"].Visible = false;
                     Dg_Maintenance.Columns["Warning"].Visible = false;
@@ -381,7 +392,7 @@ namespace LaserPrinting
                 var oStatusCodeList = await Mes.GetListResourceStatusCode(_mesData);
                 if (oStatusCodeList != null)
                 {
-                    Cb_StatusCode.DataSource = oStatusCodeList;
+                    Cb_StatusCode.DataSource = oStatusCodeList.Where(x=>x.Name.IndexOf("LS", StringComparison.Ordinal)==0).ToList();
                 }
             }
             catch (Exception ex)
@@ -404,6 +415,7 @@ namespace LaserPrinting
             lbMoveIn.Text = "";
             lbMoveOut.Text = "";
             Tb_LaserQty.Clear();
+            Tb_FinishedGoodCounter.Clear();
             kryptonDataGridView1.Rows.Clear();
             bindingSource1.DataSource = null;
         }
@@ -488,6 +500,7 @@ namespace LaserPrinting
 
         private async void btnStartPreparation_Click(object sender, EventArgs e)
         {
+            if (_mesData.ResourceStatusDetails == null) return;
             if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance") return;
             SetProductionState(ProductionState.PreparationStarted);
             await Mes.SetResourceStatus(_mesData, "LS - Planned Downtime", "Setting");
@@ -697,13 +710,68 @@ namespace LaserPrinting
 
         private void btnSetDummyQty_Click(object sender, EventArgs e)
         {
-            var setting = new Settings
+            var setting = new Settings();
+            if (_currentPo == null)
             {
-                DummyQty = (int) Tb_DummyQty.Value
-            };
-            setting.Save();
+                KryptonMessageBox.Show(this, "Please Set PO number before Set Dummy Quantity", "Dummy Qty Set", MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                Tb_DummyQty.Value = setting.DummyQty;
+                return;
+            }
+
+            setting.DummyQty = (int) Tb_DummyQty.Value;
+                setting.Save();
             _currentPo.DummyQty = setting.DummyQty;
             _currentPo?.Save(_dataLocalPo);
+            KryptonMessageBox.Show(this, "Dummy Quantity Set Successfully", "Dummy Qty Set", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private void Dg_Maintenance_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            try
+            {
+                foreach (DataGridViewRow row in Dg_Maintenance.Rows)
+                {
+                    //Console.WriteLine(Convert.ToString(row.Cells["MaintenanceState"].Value));
+                    if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Pending")
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Yellow;
+                    }
+                    else if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Due")
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Orange;
+                    }
+                    else if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Past Due")
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Red;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
+                EventLogUtil.LogErrorEvent(ex.Source, ex);
+            }
+        }
+
+        private void btnSetLaserTime_Click(object sender, EventArgs e)
+        {
+            var setting = new Settings
+            {
+                TimeOffset = (double)Tb_TimeOffset.Value
+            };
+            setting.Save();
+            KryptonMessageBox.Show(this, "Time Offset Set Successfully", "Time Offset Qty Set", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            if (_currentPo == null) return;
+            _currentPo.TimeOffset = setting.TimeOffset;
+            _currentPo?.Save(_dataLocalPo);
+        }
+
+        private void Dg_Maintenance_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

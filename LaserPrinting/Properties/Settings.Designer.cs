@@ -79,5 +79,17 @@ namespace LaserPrinting.Properties {
                 return ((string)(this["DataLocation"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public double TimeOffset {
+            get {
+                return ((double)(this["TimeOffset"]));
+            }
+            set {
+                this["TimeOffset"] = value;
+            }
+        }
     }
 }
