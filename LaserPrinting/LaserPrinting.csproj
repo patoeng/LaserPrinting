@@ -188,6 +188,7 @@
     </None>
     <None Include="LaserPrinting_TemporaryKey.pfx" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\Camstar.WCF.ObjectStack.GetMaintenanceStatusDetails.datasource" />
     <None Include="Properties\DataSources\LaserPrinting.Model.LaserPrintingProduct.datasource" />
     <None Include="Properties\DataSources\MesData.FinishedGood.datasource" />
     <None Include="Properties\Settings.settings">

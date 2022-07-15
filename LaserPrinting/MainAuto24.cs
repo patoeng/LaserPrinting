@@ -24,6 +24,7 @@ namespace LaserPrinting
         private string _productWorkflow;
         private LocalProductionOrder _currentPo;
         private string _dataLocalPo;
+        private int _indexMaintenanceState;
 
         public MainAuto24()
         {
@@ -51,6 +52,41 @@ namespace LaserPrinting
             lblTitle.Text = AppSettings.Resource;
             kryptonNavigator1.SelectedIndex = 0;
             EventLogUtil.LogEvent("Application Start");
+
+            //Prepare Maintenance Grid
+            var maintStrings = new[] { "Resource", "MaintenanceType", "MaintenanceReq", "NextDateDue", "NextThruputQtyDue", "MaintenanceState" };
+
+            for (int i = 0; i < Dg_Maintenance.Columns.Count; i++)
+            {
+                if (!maintStrings.Contains(Dg_Maintenance.Columns[i].DataPropertyName))
+                {
+                    Dg_Maintenance.Columns[i].Visible = false;
+                }
+                else
+                {
+                    switch (Dg_Maintenance.Columns[i].HeaderText)
+                    {
+
+                        case "MaintenanceType":
+                            Dg_Maintenance.Columns[i].HeaderText = @"Maintenance Type";
+                            break;
+                        case "MaintenanceReq":
+                            Dg_Maintenance.Columns[i].HeaderText = @"Maintenance Requirement";
+                            break;
+                        case "NextDateDue":
+                            Dg_Maintenance.Columns[i].HeaderText = @"Next Due Date";
+                            break;
+                        case "NextThruputQtyDue":
+                            Dg_Maintenance.Columns[i].HeaderText = @"Next Thruput Quantity Due";
+                            break;
+                        case "MaintenanceState":
+                            Dg_Maintenance.Columns[i].HeaderText = @"Maintenance State";
+                            _indexMaintenanceState = Dg_Maintenance.Columns[i].Index;
+                            break;
+                    }
+
+                }
+            }
         }
         private void InitFileWatcher()
         {
@@ -162,6 +198,11 @@ namespace LaserPrinting
                     }
                     var count = await Mes.GetCounterFromMfgOrder(_mesData);
                     Tb_LaserQty.Text = count.ToString();
+                    if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && !_currentPo.PreparationFinished)
+                    {
+                        await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
+                        await GetStatusOfResource();
+                    }
                 }
 
                 return true;
@@ -210,7 +251,7 @@ namespace LaserPrinting
                 if (!resultMoveIn)
                 {// check if fail by maintenance Past Due
                     var transPastDue = Mes.GetMaintenancePastDue(_mesData.MaintenanceStatusDetails);
-                    if (transPastDue.Result)
+                    if (transPastDue.Result && transPastDue.Data!=null)
                     {
                         KryptonMessageBox.Show(this, "This resource under maintenance, need to complete!", "Move In",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -234,14 +275,14 @@ namespace LaserPrinting
                 if (resultMoveStd.Result)
                 {
                     ThreadHelper.ControlSetText(lbMoveOut, dMoveOut.ToString(Mes.DateTimeStringFormat));
-                    if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
+                    if (!_currentPo.PreparationFinished || _mesData.ResourceStatusDetails?.Reason?.Name == "Quality Inspection")
                     {
-                        var cAttributes = new ContainerAttrDetail[1];
-                        cAttributes[0] = new ContainerAttrDetail { Name = MesContainerAttribute.LaserQualityMarkerInspect, DataType = TrivialTypeEnum.Integer, AttributeValue = $"QC_DUMMY_{_currentPo.ContainerList.Count}", IsExpression = false };
-                        var t = await Mes.ExecuteContainerAttrMaint(_mesData, product.Barcode, cAttributes);
                         _currentPo.ContainerList.Add(product.Barcode);
                         _currentPo.Save(_dataLocalPo);
-                        if (_currentPo.ContainerList.Count >= _currentPo.DummyQty)
+                        var cAttributes = new ContainerAttrDetail[1];
+                        cAttributes[0] = new ContainerAttrDetail { Name = MesContainerAttribute.LaserQualityMarkerInspect, DataType = TrivialTypeEnum.Integer, AttributeValue = $"{_currentPo.ContainerList.Count}", IsExpression = false };
+                        var t = await Mes.ExecuteContainerAttrMaint(_mesData, product.Barcode, cAttributes);
+                        if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && _mesData?.ResourceStatusDetails?.Reason?.Name!= "Quality Inspection")
                         {
                             await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
                             await GetStatusOfResource();
@@ -309,6 +350,11 @@ namespace LaserPrinting
 
                 if (resourceStatus != null)
                 {
+                    if (_mesData.ResourceStatusDetails?.Reason?.Name != "Quality Inspection")
+                    {
+                        btnFinishPreparation.Enabled = true;
+                        btnStartPreparation.Enabled = false;
+                    }
                     if (resourceStatus.Status != null) Cb_StatusCode.Text = resourceStatus.Status.Name;
                     await Task.Delay(1000);
                     if (resourceStatus.Reason != null) Cb_StatusReason.Text = resourceStatus.Reason.Name;
@@ -344,40 +390,15 @@ namespace LaserPrinting
             try
             {
                 var maintenanceStatusDetails = await Mes.GetMaintenanceStatusDetails(_mesData);
+                _mesData.SetMaintenanceStatusDetails(maintenanceStatusDetails);
                 if (maintenanceStatusDetails != null)
                 {
-                    _mesData.SetMaintenanceStatusDetails(maintenanceStatusDetails);
-                    Dg_Maintenance.DataSource = maintenanceStatusDetails;
-                    Dg_Maintenance.Columns["Due"].Visible = false;
-                    Dg_Maintenance.Columns["Warning"].Visible = false;
-                    Dg_Maintenance.Columns["PastDue"].Visible = false;
-                    Dg_Maintenance.Columns["MaintenanceReqName"].Visible = false;
-                    Dg_Maintenance.Columns["MaintenanceReqDisplayName"].Visible = false;
-                    Dg_Maintenance.Columns["ResourceStatusCodeName"].Visible = false;
-                    Dg_Maintenance.Columns["UOMName"].Visible = false;
-                    Dg_Maintenance.Columns["ResourceName"].Visible = false;
-                    Dg_Maintenance.Columns["UOM2Name"].Visible = false;
-                    Dg_Maintenance.Columns["MaintenanceReqRev"].Visible = false;
-                    Dg_Maintenance.Columns["NextThruputQty2Warning"].Visible = false;
-                    Dg_Maintenance.Columns["NextThruputQty2Limit"].Visible = false;
-                    Dg_Maintenance.Columns["UOM2"].Visible = false;
-                    Dg_Maintenance.Columns["ThruputQty2"].Visible = false;
-                    Dg_Maintenance.Columns["Resource"].Visible = false;
-                    Dg_Maintenance.Columns["ResourceStatusCode"].Visible = false;
-                    Dg_Maintenance.Columns["NextThruputQty2Due"].Visible = false;
-                    Dg_Maintenance.Columns["MaintenanceClassName"].Visible = false;
-                    Dg_Maintenance.Columns["MaintenanceStatus"].Visible = false;
-                    Dg_Maintenance.Columns["ExportImportKey"].Visible = false;
-                    Dg_Maintenance.Columns["DisplayName"].Visible = false;
-                    Dg_Maintenance.Columns["Self"].Visible = false;
-                    Dg_Maintenance.Columns["IsEmpty"].Visible = false;
-                    Dg_Maintenance.Columns["FieldAction"].Visible = false;
-                    Dg_Maintenance.Columns["IgnoreTypeDifference"].Visible = false;
-                    Dg_Maintenance.Columns["ListItemAction"].Visible = false;
-                    Dg_Maintenance.Columns["ListItemIndex"].Visible = false;
-                    Dg_Maintenance.Columns["CDOTypeName"].Visible = false;
-                    Dg_Maintenance.Columns["key"].Visible = false;
+                    getMaintenanceStatusDetailsBindingSource.DataSource =
+                        new BindingList<GetMaintenanceStatusDetails>(maintenanceStatusDetails);
+                    Dg_Maintenance.DataSource = getMaintenanceStatusDetailsBindingSource;
+                    return;
                 }
+                getMaintenanceStatusDetailsBindingSource.Clear();
             }
             catch (Exception ex)
             {
@@ -727,33 +748,7 @@ namespace LaserPrinting
                 MessageBoxIcon.Information);
         }
 
-        private void Dg_Maintenance_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            try
-            {
-                foreach (DataGridViewRow row in Dg_Maintenance.Rows)
-                {
-                    //Console.WriteLine(Convert.ToString(row.Cells["MaintenanceState"].Value));
-                    if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Pending")
-                    {
-                        row.DefaultCellStyle.BackColor = Color.Yellow;
-                    }
-                    else if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Due")
-                    {
-                        row.DefaultCellStyle.BackColor = Color.Orange;
-                    }
-                    else if (Convert.ToString(row.Cells["MaintenanceState"].Value) == "Past Due")
-                    {
-                        row.DefaultCellStyle.BackColor = Color.Red;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
-                EventLogUtil.LogErrorEvent(ex.Source, ex);
-            }
-        }
+     
 
         private void btnSetLaserTime_Click(object sender, EventArgs e)
         {
@@ -769,9 +764,32 @@ namespace LaserPrinting
             _currentPo?.Save(_dataLocalPo);
         }
 
-        private void Dg_Maintenance_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void Dg_Maintenance_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-
+            try
+            {
+                foreach (DataGridViewRow row in Dg_Maintenance.Rows)
+                {
+                    switch (Convert.ToString(row.Cells[_indexMaintenanceState].Value))
+                    {
+                        //Console.WriteLine(Convert.ToString(row.Cells["MaintenanceState"].Value));
+                        case "Pending":
+                            row.DefaultCellStyle.BackColor = Color.Yellow;
+                            break;
+                        case "Due":
+                            row.DefaultCellStyle.BackColor = Color.Orange;
+                            break;
+                        case "Past Due":
+                            row.DefaultCellStyle.BackColor = Color.Red;
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.Source = AppSettings.AssemblyName == ex.Source ? MethodBase.GetCurrentMethod()?.Name : MethodBase.GetCurrentMethod()?.Name + "." + ex.Source;
+                EventLogUtil.LogErrorEvent(ex.Source, ex);
+            }
         }
     }
 }
