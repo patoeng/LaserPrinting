@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace LaserPrinting
             _mesData = new Mes(name, AppSettings.Resource,name);
 
             MyTitle.Text = @"Laser Printing";
-            lblTitle.Text = AppSettings.Resource;
+            lbTitle.Text = AppSettings.Resource;
             kryptonNavigator1.SelectedIndex = 0;
             EventLogUtil.LogEvent("Application Start");
 
@@ -91,6 +92,13 @@ namespace LaserPrinting
         private void InitFileWatcher()
         {
             var setting = new Settings();
+            if (!Directory.Exists(setting.LaserDatalogLocation))
+            {
+                KryptonMessageBox.Show($"Directory {setting.LaserDatalogLocation} does not exist!\r\nApplication will now exit!", "Init File Watcher",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.ExitThread();
+                Application.Exit();
+            }
             _watcher = new DatalogFileWatcher(setting.LaserDatalogLocation, setting.LaserDatalogPattern);
             _watcher.FileChangedDetected += DatalogParserMethod;
         }
@@ -228,7 +236,7 @@ namespace LaserPrinting
 
                 var dMoveIn = product.PrintedDateTime.AddHours(_currentPo.TimeOffset);
                 ThreadHelper.ControlSetText(Tb_ArticleNumber,product.ArticleNumber);
-                ThreadHelper.ControlSetText(tbSerialNumber, product.Barcode);
+                ThreadHelper.ControlSetText(Tb_SerialNumber, product.Barcode);
                 ThreadHelper.ControlSetText(lbMoveIn, dMoveIn.ToString(Mes.DateTimeStringFormat));
                 ThreadHelper.ControlSetText(lbMoveOut, "");
 
@@ -432,7 +440,7 @@ namespace LaserPrinting
             Tb_MfgEndDate.Clear();
             Tb_MfgQty.Clear();
             Tb_ArticleNumber.Clear();
-            tbSerialNumber.Clear();
+            Tb_SerialNumber.Clear();
             lbMoveIn.Text = "";
             lbMoveOut.Text = "";
             Tb_LaserQty.Clear();
@@ -521,8 +529,19 @@ namespace LaserPrinting
 
         private async void btnStartPreparation_Click(object sender, EventArgs e)
         {
-            if (_mesData.ResourceStatusDetails == null) return;
-            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance") return;
+            if (_mesData.ResourceStatusDetails == null)
+            {
+                KryptonMessageBox.Show("Resource Status not yet retrieved", "Start Preparation", MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance")
+            {
+                KryptonMessageBox.Show("Resource Status under Maintenance", "Start Preparation", MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
             SetProductionState(ProductionState.PreparationStarted);
             await Mes.SetResourceStatus(_mesData, "LS - Planned Downtime", "Setting");
             await GetStatusOfResource();
@@ -571,7 +590,7 @@ namespace LaserPrinting
                 KryptonMessageBox.Show("CP under maintenance");
                 return;
             }
-            using (var ss = new LoginForm24())
+            using (var ss = new LoginForm24("Quality"))
             {
                 var dlg = ss.ShowDialog(this);
                 if (dlg == DialogResult.Abort)
@@ -710,7 +729,7 @@ namespace LaserPrinting
         {
             if (e.Index != 1 && e.Index != 2) return;
 
-            using (var ss = new LoginForm24())
+            using (var ss = new LoginForm24(e.Index==1? "Maintenance":"Quality"))
             {
                 var dlg = ss.ShowDialog(this);
                 if (dlg == DialogResult.Abort)
