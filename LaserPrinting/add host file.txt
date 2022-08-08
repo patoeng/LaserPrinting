@@ -1,0 +1,3 @@
+echo 10.4.1.50 idmesdbsprd.wik-group.com >> C:\Windows\System32\drivers\etc\hosts
+CERTUTIL -f -p Oper-2021 -importpfx "IDMESDBSPRD.pfx"
+CERTUTIL -addstore -enterprise -f -v root "IDMESDBSPRD.pfx"

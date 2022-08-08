@@ -31,13 +31,16 @@ namespace LaserPrinting
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainAuto24));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TemplateUI = new ComponentFactory.Krypton.Toolkit.KryptonPalette(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonPanel4 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
-            this.Logo = new System.Windows.Forms.PictureBox();
+            this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
+            this.kryptonPanel10 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
+            this.lblResMaintMesg = new System.Windows.Forms.Label();
             this.lbTitle = new System.Windows.Forms.Label();
             this.MyTitle = new System.Windows.Forms.Label();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.Logo = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonPanel1 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
@@ -72,7 +75,6 @@ namespace LaserPrinting
             this.Tb_ArticleNumber = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.btnCallMaintenance = new ComponentFactory.Krypton.Toolkit.KryptonButton();
             this.btnFinishPreparation = new ComponentFactory.Krypton.Toolkit.KryptonButton();
-            this.btnEndProduction = new ComponentFactory.Krypton.Toolkit.KryptonButton();
             this.kryptonPanel5 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
             this.lbMoveOut = new System.Windows.Forms.Label();
             this.Tb_SerialNumber = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
@@ -81,8 +83,7 @@ namespace LaserPrinting
             this.lbMoveIn = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.kryptonPage2 = new ComponentFactory.Krypton.Navigator.KryptonPage();
-            this.Tb_TimeOffset = new ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.Dg_Maintenance = new ComponentFactory.Krypton.Toolkit.KryptonDataGridView();
             this.resourceDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.maintenanceTypeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -139,29 +140,38 @@ namespace LaserPrinting
             this.Tb_StatusCodeM = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.btnSetMachineStatus = new ComponentFactory.Krypton.Toolkit.KryptonButton();
             this.Cb_StatusReason = new ComponentFactory.Krypton.Toolkit.KryptonComboBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnSetLaserTime = new ComponentFactory.Krypton.Toolkit.KryptonButton();
+            this.label6 = new System.Windows.Forms.Label();
+            this.Tb_TimeOffset = new ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown();
             this.kryptonPage3 = new ComponentFactory.Krypton.Navigator.KryptonPage();
             this.kryptonPanel8 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
-            this.Tb_DummyQty = new ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown();
-            this.label14 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonDataGridView1 = new ComponentFactory.Krypton.Toolkit.KryptonDataGridView();
             this.serialNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.label14 = new System.Windows.Forms.Label();
+            this.btnSetDummyQty = new ComponentFactory.Krypton.Toolkit.KryptonButton();
+            this.Tb_DummyQty = new ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown();
             this.kryptonPage4 = new ComponentFactory.Krypton.Navigator.KryptonPage();
             this.kryptonPanel9 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
+            this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.lblLoading = new System.Windows.Forms.Label();
-            this.Tb_FinishedGoodCounter = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.lblPo = new System.Windows.Forms.Label();
             this.kryptonDataGridView2 = new ComponentFactory.Krypton.Toolkit.KryptonDataGridView();
-            this.TimerRealtime = new System.Windows.Forms.Timer(this.components);
-            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.serialNumberDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.controlPointDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.label28 = new System.Windows.Forms.Label();
+            this.Tb_FinishedGoodCounter = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.btnSetLaserTime = new ComponentFactory.Krypton.Toolkit.KryptonButton();
-            this.btnSetDummyQty = new ComponentFactory.Krypton.Toolkit.KryptonButton();
+            this.TimerRealtime = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).BeginInit();
             this.kryptonPanel4.SuspendLayout();
+            this.tableLayoutPanel9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel10)).BeginInit();
+            this.kryptonPanel10.SuspendLayout();
+            this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -185,6 +195,7 @@ namespace LaserPrinting
             this.kryptonPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage2)).BeginInit();
             this.kryptonPage2.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Dg_Maintenance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.getMaintenanceStatusDetailsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResourceSetupGrouping)).BeginInit();
@@ -193,16 +204,22 @@ namespace LaserPrinting
             this.ResourceSetupGrouping.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Cb_StatusCode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Cb_StatusReason)).BeginInit();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage3)).BeginInit();
             this.kryptonPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel8)).BeginInit();
             this.kryptonPanel8.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView1)).BeginInit();
+            this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage4)).BeginInit();
             this.kryptonPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel9)).BeginInit();
             this.kryptonPanel9.SuspendLayout();
+            this.tableLayoutPanel8.SuspendLayout();
+            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView2)).BeginInit();
+            this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -242,52 +259,78 @@ namespace LaserPrinting
             // 
             this.tableLayoutPanel1.BackColor = System.Drawing.Color.White;
             this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.kryptonPanel4, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.61765F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 88.38235F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1273, 680);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // kryptonPanel4
             // 
-            this.kryptonPanel4.Controls.Add(this.Logo);
-            this.kryptonPanel4.Controls.Add(this.lbTitle);
-            this.kryptonPanel4.Controls.Add(this.MyTitle);
+            this.kryptonPanel4.Controls.Add(this.tableLayoutPanel9);
             this.kryptonPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel4.Location = new System.Drawing.Point(3, 3);
             this.kryptonPanel4.Name = "kryptonPanel4";
             this.kryptonPanel4.Palette = this.TemplateUI;
             this.kryptonPanel4.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
             this.kryptonPanel4.PanelBackStyle = ComponentFactory.Krypton.Toolkit.PaletteBackStyle.ControlCustom1;
-            this.kryptonPanel4.Size = new System.Drawing.Size(1267, 73);
+            this.kryptonPanel4.Size = new System.Drawing.Size(1267, 74);
             this.kryptonPanel4.TabIndex = 1;
             // 
-            // Logo
+            // tableLayoutPanel9
             // 
-            this.Logo.Image = ((System.Drawing.Image)(resources.GetObject("Logo.Image")));
-            this.Logo.Location = new System.Drawing.Point(1100, 10);
-            this.Logo.Margin = new System.Windows.Forms.Padding(4);
-            this.Logo.Name = "Logo";
-            this.Logo.Size = new System.Drawing.Size(118, 59);
-            this.Logo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.Logo.TabIndex = 64;
-            this.Logo.TabStop = false;
+            this.tableLayoutPanel9.ColumnCount = 2;
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 211F));
+            this.tableLayoutPanel9.Controls.Add(this.kryptonPanel10, 0, 0);
+            this.tableLayoutPanel9.Controls.Add(this.panel5, 1, 0);
+            this.tableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel9.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel9.Name = "tableLayoutPanel9";
+            this.tableLayoutPanel9.RowCount = 1;
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(1267, 74);
+            this.tableLayoutPanel9.TabIndex = 61;
+            // 
+            // kryptonPanel10
+            // 
+            this.kryptonPanel10.Controls.Add(this.lblResMaintMesg);
+            this.kryptonPanel10.Controls.Add(this.lbTitle);
+            this.kryptonPanel10.Controls.Add(this.MyTitle);
+            this.kryptonPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonPanel10.Location = new System.Drawing.Point(3, 3);
+            this.kryptonPanel10.Name = "kryptonPanel10";
+            this.kryptonPanel10.Size = new System.Drawing.Size(1050, 68);
+            this.kryptonPanel10.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(252)))), ((int)(((byte)(252)))));
+            this.kryptonPanel10.StateCommon.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(252)))), ((int)(((byte)(252)))));
+            this.kryptonPanel10.TabIndex = 1;
+            // 
+            // lblResMaintMesg
+            // 
+            this.lblResMaintMesg.AutoSize = true;
+            this.lblResMaintMesg.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblResMaintMesg.Location = new System.Drawing.Point(272, 13);
+            this.lblResMaintMesg.Name = "lblResMaintMesg";
+            this.lblResMaintMesg.Size = new System.Drawing.Size(50, 21);
+            this.lblResMaintMesg.TabIndex = 58;
+            this.lblResMaintMesg.Text = "Maint";
+            this.lblResMaintMesg.Visible = false;
             // 
             // lbTitle
             // 
             this.lbTitle.AutoSize = true;
             this.lbTitle.Font = new System.Drawing.Font("Segoe UI Black", 14F);
             this.lbTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(68)))), ((int)(((byte)(101)))));
-            this.lbTitle.Location = new System.Drawing.Point(19, 36);
+            this.lbTitle.Location = new System.Drawing.Point(9, 36);
             this.lbTitle.Name = "lbTitle";
             this.lbTitle.Size = new System.Drawing.Size(162, 25);
-            this.lbTitle.TabIndex = 63;
+            this.lbTitle.TabIndex = 56;
             this.lbTitle.Text = "BW01-NM1-PPA";
             // 
             // MyTitle
@@ -295,11 +338,31 @@ namespace LaserPrinting
             this.MyTitle.AutoSize = true;
             this.MyTitle.Font = new System.Drawing.Font("Segoe UI Black", 16F, System.Drawing.FontStyle.Bold);
             this.MyTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(68)))), ((int)(((byte)(101)))));
-            this.MyTitle.Location = new System.Drawing.Point(16, 6);
+            this.MyTitle.Location = new System.Drawing.Point(9, 6);
             this.MyTitle.Name = "MyTitle";
             this.MyTitle.Size = new System.Drawing.Size(188, 30);
-            this.MyTitle.TabIndex = 62;
+            this.MyTitle.TabIndex = 55;
             this.MyTitle.Text = "PCBA and Pump";
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.Logo);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel5.Location = new System.Drawing.Point(1059, 3);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(205, 68);
+            this.panel5.TabIndex = 2;
+            // 
+            // Logo
+            // 
+            this.Logo.Image = ((System.Drawing.Image)(resources.GetObject("Logo.Image")));
+            this.Logo.Location = new System.Drawing.Point(44, 5);
+            this.Logo.Margin = new System.Windows.Forms.Padding(4);
+            this.Logo.Name = "Logo";
+            this.Logo.Size = new System.Drawing.Size(128, 56);
+            this.Logo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.Logo.TabIndex = 54;
+            this.Logo.TabStop = false;
             // 
             // tableLayoutPanel2
             // 
@@ -309,17 +372,17 @@ namespace LaserPrinting
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel4, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 82);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 83);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1267, 595);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1267, 594);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // tableLayoutPanel3
             // 
             this.tableLayoutPanel3.ColumnCount = 1;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.Controls.Add(this.kryptonPanel1, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.kryptonPanel2, 0, 1);
             this.tableLayoutPanel3.Controls.Add(this.kryptonPanel3, 0, 2);
@@ -327,10 +390,10 @@ namespace LaserPrinting
             this.tableLayoutPanel3.Location = new System.Drawing.Point(1056, 3);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 3;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75.30864F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.69136F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 170F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(208, 589);
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 79F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 127F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(208, 588);
             this.tableLayoutPanel3.TabIndex = 0;
             // 
             // kryptonPanel1
@@ -340,7 +403,7 @@ namespace LaserPrinting
             this.kryptonPanel1.Location = new System.Drawing.Point(3, 3);
             this.kryptonPanel1.Name = "kryptonPanel1";
             this.kryptonPanel1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel1.Size = new System.Drawing.Size(202, 309);
+            this.kryptonPanel1.Size = new System.Drawing.Size(202, 376);
             this.kryptonPanel1.TabIndex = 0;
             // 
             // pbProduct
@@ -348,6 +411,7 @@ namespace LaserPrinting
             this.pbProduct.Location = new System.Drawing.Point(18, 62);
             this.pbProduct.Name = "pbProduct";
             this.pbProduct.Size = new System.Drawing.Size(167, 205);
+            this.pbProduct.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbProduct.TabIndex = 1;
             this.pbProduct.TabStop = false;
             // 
@@ -356,16 +420,16 @@ namespace LaserPrinting
             this.kryptonPanel2.Controls.Add(this.Tb_LaserQty);
             this.kryptonPanel2.Controls.Add(this.label18);
             this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel2.Location = new System.Drawing.Point(3, 318);
+            this.kryptonPanel2.Location = new System.Drawing.Point(3, 385);
             this.kryptonPanel2.Name = "kryptonPanel2";
             this.kryptonPanel2.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel2.Size = new System.Drawing.Size(202, 97);
+            this.kryptonPanel2.Size = new System.Drawing.Size(202, 73);
             this.kryptonPanel2.TabIndex = 0;
             // 
             // Tb_LaserQty
             // 
             this.Tb_LaserQty.Enabled = false;
-            this.Tb_LaserQty.Location = new System.Drawing.Point(10, 44);
+            this.Tb_LaserQty.Location = new System.Drawing.Point(15, 29);
             this.Tb_LaserQty.Margin = new System.Windows.Forms.Padding(1);
             this.Tb_LaserQty.Name = "Tb_LaserQty";
             this.Tb_LaserQty.Size = new System.Drawing.Size(172, 29);
@@ -391,7 +455,7 @@ namespace LaserPrinting
             this.label18.BackColor = System.Drawing.Color.Transparent;
             this.label18.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.label18.ForeColor = System.Drawing.Color.Black;
-            this.label18.Location = new System.Drawing.Point(11, 24);
+            this.label18.Location = new System.Drawing.Point(16, 9);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(156, 19);
             this.label18.TabIndex = 104;
@@ -404,16 +468,16 @@ namespace LaserPrinting
             this.kryptonPanel3.Controls.Add(this.label20);
             this.kryptonPanel3.Controls.Add(this.Tb_StatusCode);
             this.kryptonPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel3.Location = new System.Drawing.Point(3, 421);
+            this.kryptonPanel3.Location = new System.Drawing.Point(3, 464);
             this.kryptonPanel3.Name = "kryptonPanel3";
             this.kryptonPanel3.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel3.Size = new System.Drawing.Size(202, 165);
+            this.kryptonPanel3.Size = new System.Drawing.Size(202, 121);
             this.kryptonPanel3.TabIndex = 0;
             // 
             // Tb_TimeAtStatus
             // 
             this.Tb_TimeAtStatus.Enabled = false;
-            this.Tb_TimeAtStatus.Location = new System.Drawing.Point(9, 129);
+            this.Tb_TimeAtStatus.Location = new System.Drawing.Point(13, 81);
             this.Tb_TimeAtStatus.Name = "Tb_TimeAtStatus";
             this.Tb_TimeAtStatus.Size = new System.Drawing.Size(173, 27);
             this.Tb_TimeAtStatus.StateCommon.Back.Color1 = System.Drawing.Color.White;
@@ -438,7 +502,7 @@ namespace LaserPrinting
             this.label19.BackColor = System.Drawing.Color.Transparent;
             this.label19.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.label19.ForeColor = System.Drawing.Color.Black;
-            this.label19.Location = new System.Drawing.Point(10, 56);
+            this.label19.Location = new System.Drawing.Point(14, 8);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(149, 19);
             this.label19.TabIndex = 112;
@@ -450,7 +514,7 @@ namespace LaserPrinting
             this.label20.BackColor = System.Drawing.Color.Transparent;
             this.label20.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.label20.ForeColor = System.Drawing.Color.Black;
-            this.label20.Location = new System.Drawing.Point(10, 109);
+            this.label20.Location = new System.Drawing.Point(14, 61);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(111, 19);
             this.label20.TabIndex = 114;
@@ -459,7 +523,7 @@ namespace LaserPrinting
             // Tb_StatusCode
             // 
             this.Tb_StatusCode.Enabled = false;
-            this.Tb_StatusCode.Location = new System.Drawing.Point(9, 76);
+            this.Tb_StatusCode.Location = new System.Drawing.Point(13, 28);
             this.Tb_StatusCode.Name = "Tb_StatusCode";
             this.Tb_StatusCode.Size = new System.Drawing.Size(173, 27);
             this.Tb_StatusCode.StateCommon.Back.Color1 = System.Drawing.Color.White;
@@ -488,7 +552,7 @@ namespace LaserPrinting
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(1047, 589);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(1047, 588);
             this.tableLayoutPanel4.TabIndex = 1;
             // 
             // kryptonNavigator1
@@ -504,8 +568,8 @@ namespace LaserPrinting
             this.kryptonPage4});
             this.kryptonNavigator1.Palette = this.TemplateUI;
             this.kryptonNavigator1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.kryptonNavigator1.SelectedIndex = 1;
-            this.kryptonNavigator1.Size = new System.Drawing.Size(1041, 583);
+            this.kryptonNavigator1.SelectedIndex = 0;
+            this.kryptonNavigator1.Size = new System.Drawing.Size(1041, 582);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingInside = new System.Windows.Forms.Padding(0);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingOnly = new System.Windows.Forms.Padding(0);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingOutside = new System.Windows.Forms.Padding(0);
@@ -596,7 +660,7 @@ namespace LaserPrinting
             this.kryptonPage1.Margin = new System.Windows.Forms.Padding(0);
             this.kryptonPage1.MinimumSize = new System.Drawing.Size(200, 200);
             this.kryptonPage1.Name = "kryptonPage1";
-            this.kryptonPage1.Size = new System.Drawing.Size(1039, 544);
+            this.kryptonPage1.Size = new System.Drawing.Size(1039, 543);
             this.kryptonPage1.Text = "Operator";
             this.kryptonPage1.ToolTipTitle = "Page ToolTip";
             this.kryptonPage1.UniqueName = "501B0C3FE96C4E3A44B7C108A74D7124";
@@ -619,7 +683,7 @@ namespace LaserPrinting
             this.kryptonPanel7.Location = new System.Drawing.Point(0, 95);
             this.kryptonPanel7.Name = "kryptonPanel7";
             this.kryptonPanel7.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel7.Size = new System.Drawing.Size(1039, 284);
+            this.kryptonPanel7.Size = new System.Drawing.Size(1039, 283);
             this.kryptonPanel7.TabIndex = 2;
             // 
             // label15
@@ -727,7 +791,7 @@ namespace LaserPrinting
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
             this.label3.ForeColor = System.Drawing.Color.Black;
-            this.label3.Location = new System.Drawing.Point(61, 198);
+            this.label3.Location = new System.Drawing.Point(54, 198);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(123, 24);
             this.label3.TabIndex = 100;
@@ -760,11 +824,11 @@ namespace LaserPrinting
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
             this.label2.ForeColor = System.Drawing.Color.Black;
-            this.label2.Location = new System.Drawing.Point(61, 110);
+            this.label2.Location = new System.Drawing.Point(57, 110);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(85, 24);
+            this.label2.Size = new System.Drawing.Size(146, 24);
             this.label2.TabIndex = 96;
-            this.label2.Text = "Product :";
+            this.label2.Text = "Article Number :";
             // 
             // Tb_MfgProduct
             // 
@@ -882,9 +946,8 @@ namespace LaserPrinting
             this.kryptonPanel6.Controls.Add(this.Tb_ArticleNumber);
             this.kryptonPanel6.Controls.Add(this.btnCallMaintenance);
             this.kryptonPanel6.Controls.Add(this.btnFinishPreparation);
-            this.kryptonPanel6.Controls.Add(this.btnEndProduction);
             this.kryptonPanel6.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.kryptonPanel6.Location = new System.Drawing.Point(0, 379);
+            this.kryptonPanel6.Location = new System.Drawing.Point(0, 378);
             this.kryptonPanel6.Name = "kryptonPanel6";
             this.kryptonPanel6.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
             this.kryptonPanel6.Size = new System.Drawing.Size(1039, 165);
@@ -898,9 +961,9 @@ namespace LaserPrinting
             this.label16.ForeColor = System.Drawing.Color.Black;
             this.label16.Location = new System.Drawing.Point(51, 4);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(146, 24);
+            this.label16.Size = new System.Drawing.Size(147, 24);
             this.label16.TabIndex = 104;
-            this.label16.Text = "Article Number :";
+            this.label16.Text = "Rating Drawing :";
             // 
             // btnStartPreparation
             // 
@@ -1113,61 +1176,6 @@ namespace LaserPrinting
             this.btnFinishPreparation.Values.Text = "Finish Preparation";
             this.btnFinishPreparation.Click += new System.EventHandler(this.btnFinishPreparation_Click);
             // 
-            // btnEndProduction
-            // 
-            this.btnEndProduction.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnEndProduction.Enabled = false;
-            this.btnEndProduction.Location = new System.Drawing.Point(514, 91);
-            this.btnEndProduction.Name = "btnEndProduction";
-            this.btnEndProduction.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.OverrideDefault.Back.ColorAngle = 45F;
-            this.btnEndProduction.OverrideDefault.Border.ColorAngle = 45F;
-            this.btnEndProduction.OverrideDefault.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnEndProduction.OverrideDefault.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.btnEndProduction.OverrideDefault.Border.Rounding = 30;
-            this.btnEndProduction.OverrideDefault.Border.Width = 1;
-            this.btnEndProduction.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.btnEndProduction.Size = new System.Drawing.Size(189, 55);
-            this.btnEndProduction.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.StateCommon.Back.ColorAngle = 45F;
-            this.btnEndProduction.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(74)))), ((int)(((byte)(147)))));
-            this.btnEndProduction.StateCommon.Border.ColorAngle = 45F;
-            this.btnEndProduction.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnEndProduction.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.btnEndProduction.StateCommon.Border.Rounding = 30;
-            this.btnEndProduction.StateCommon.Border.Width = 1;
-            this.btnEndProduction.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
-            this.btnEndProduction.StateCommon.Content.ShortText.Color2 = System.Drawing.Color.White;
-            this.btnEndProduction.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnEndProduction.StateDisabled.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.btnEndProduction.StateDisabled.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.btnEndProduction.StatePressed.Back.ColorAngle = 135F;
-            this.btnEndProduction.StatePressed.Border.ColorAngle = 135F;
-            this.btnEndProduction.StatePressed.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnEndProduction.StatePressed.Border.Rounding = 30;
-            this.btnEndProduction.StatePressed.Border.Width = 1;
-            this.btnEndProduction.StateTracking.Back.ColorAngle = 45F;
-            this.btnEndProduction.StateTracking.Border.ColorAngle = 45F;
-            this.btnEndProduction.StateTracking.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnEndProduction.StateTracking.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.btnEndProduction.StateTracking.Border.Rounding = 30;
-            this.btnEndProduction.StateTracking.Border.Width = 1;
-            this.btnEndProduction.TabIndex = 102;
-            this.btnEndProduction.Values.Text = "End Production";
-            this.btnEndProduction.Visible = false;
-            this.btnEndProduction.Click += new System.EventHandler(this.btnEndProduction_Click);
-            // 
             // kryptonPanel5
             // 
             this.kryptonPanel5.Controls.Add(this.lbMoveOut);
@@ -1271,11 +1279,7 @@ namespace LaserPrinting
             // kryptonPage2
             // 
             this.kryptonPage2.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.kryptonPage2.Controls.Add(this.btnSetLaserTime);
-            this.kryptonPage2.Controls.Add(this.Tb_TimeOffset);
-            this.kryptonPage2.Controls.Add(this.label6);
-            this.kryptonPage2.Controls.Add(this.Dg_Maintenance);
-            this.kryptonPage2.Controls.Add(this.ResourceSetupGrouping);
+            this.kryptonPage2.Controls.Add(this.tableLayoutPanel5);
             this.kryptonPage2.Flags = 65534;
             this.kryptonPage2.LastVisibleSet = true;
             this.kryptonPage2.MinimumSize = new System.Drawing.Size(50, 50);
@@ -1285,49 +1289,22 @@ namespace LaserPrinting
             this.kryptonPage2.ToolTipTitle = "Page ToolTip";
             this.kryptonPage2.UniqueName = "A9D5235342774A400794C8B7FCD02899";
             // 
-            // Tb_TimeOffset
+            // tableLayoutPanel5
             // 
-            this.Tb_TimeOffset.DecimalPlaces = 1;
-            this.Tb_TimeOffset.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.Tb_TimeOffset.InterceptArrowKeys = false;
-            this.Tb_TimeOffset.Location = new System.Drawing.Point(27, 482);
-            this.Tb_TimeOffset.Maximum = new decimal(new int[] {
-            24,
-            0,
-            0,
-            0});
-            this.Tb_TimeOffset.Minimum = new decimal(new int[] {
-            24,
-            0,
-            0,
-            -2147483648});
-            this.Tb_TimeOffset.Name = "Tb_TimeOffset";
-            this.Tb_TimeOffset.Palette = this.TemplateUI;
-            this.Tb_TimeOffset.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.Tb_TimeOffset.Size = new System.Drawing.Size(406, 45);
-            this.Tb_TimeOffset.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.Tb_TimeOffset.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.Tb_TimeOffset.StateCommon.Border.Rounding = 30;
-            this.Tb_TimeOffset.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Tb_TimeOffset.TabIndex = 102;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.BackColor = System.Drawing.Color.Transparent;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.label6.ForeColor = System.Drawing.Color.Black;
-            this.label6.Location = new System.Drawing.Point(34, 449);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(188, 24);
-            this.label6.TabIndex = 100;
-            this.label6.Text = "Set Laser Time Offset";
+            this.tableLayoutPanel5.ColumnCount = 1;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.Controls.Add(this.Dg_Maintenance, 0, 1);
+            this.tableLayoutPanel5.Controls.Add(this.ResourceSetupGrouping, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.panel1, 0, 2);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 3;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 123F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110F));
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(1039, 544);
+            this.tableLayoutPanel5.TabIndex = 104;
             // 
             // Dg_Maintenance
             // 
@@ -1383,14 +1360,15 @@ namespace LaserPrinting
             this.keyDataGridViewTextBoxColumn,
             this.cDOTypeNameDataGridViewTextBoxColumn});
             this.Dg_Maintenance.DataSource = this.getMaintenanceStatusDetailsBindingSource;
-            this.Dg_Maintenance.Location = new System.Drawing.Point(18, 154);
+            this.Dg_Maintenance.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Dg_Maintenance.Location = new System.Drawing.Point(3, 126);
             this.Dg_Maintenance.Name = "Dg_Maintenance";
             this.Dg_Maintenance.Palette = this.TemplateUI;
             this.Dg_Maintenance.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
             this.Dg_Maintenance.ReadOnly = true;
             this.Dg_Maintenance.RowHeadersWidth = 51;
             this.Dg_Maintenance.RowTemplate.Height = 24;
-            this.Dg_Maintenance.Size = new System.Drawing.Size(1009, 288);
+            this.Dg_Maintenance.Size = new System.Drawing.Size(1033, 305);
             this.Dg_Maintenance.StateCommon.Background.Color1 = System.Drawing.Color.White;
             this.Dg_Maintenance.StateCommon.Background.Color2 = System.Drawing.Color.White;
             this.Dg_Maintenance.StateCommon.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
@@ -1800,7 +1778,8 @@ namespace LaserPrinting
             // 
             // ResourceSetupGrouping
             // 
-            this.ResourceSetupGrouping.Location = new System.Drawing.Point(17, 4);
+            this.ResourceSetupGrouping.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ResourceSetupGrouping.Location = new System.Drawing.Point(3, 3);
             this.ResourceSetupGrouping.Name = "ResourceSetupGrouping";
             // 
             // ResourceSetupGrouping.Panel
@@ -1812,7 +1791,7 @@ namespace LaserPrinting
             this.ResourceSetupGrouping.Panel.Controls.Add(this.Tb_StatusCodeM);
             this.ResourceSetupGrouping.Panel.Controls.Add(this.btnSetMachineStatus);
             this.ResourceSetupGrouping.Panel.Controls.Add(this.Cb_StatusReason);
-            this.ResourceSetupGrouping.Size = new System.Drawing.Size(1012, 129);
+            this.ResourceSetupGrouping.Size = new System.Drawing.Size(1033, 117);
             this.ResourceSetupGrouping.StateCommon.Back.Color1 = System.Drawing.Color.White;
             this.ResourceSetupGrouping.StateCommon.Back.Color2 = System.Drawing.Color.White;
             this.ResourceSetupGrouping.StateCommon.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
@@ -2014,291 +1993,21 @@ namespace LaserPrinting
             this.Cb_StatusReason.TabIndex = 37;
             this.Cb_StatusReason.Text = "No Material";
             // 
-            // kryptonPage3
+            // panel1
             // 
-            this.kryptonPage3.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.kryptonPage3.Controls.Add(this.kryptonPanel8);
-            this.kryptonPage3.Flags = 65534;
-            this.kryptonPage3.LastVisibleSet = true;
-            this.kryptonPage3.MinimumSize = new System.Drawing.Size(50, 50);
-            this.kryptonPage3.Name = "kryptonPage3";
-            this.kryptonPage3.Size = new System.Drawing.Size(1039, 544);
-            this.kryptonPage3.Text = "Quality";
-            this.kryptonPage3.ToolTipTitle = "Page ToolTip";
-            this.kryptonPage3.UniqueName = "93024F31D9FB40C23D948F5CF665302C";
-            // 
-            // kryptonPanel8
-            // 
-            this.kryptonPanel8.Controls.Add(this.btnSetDummyQty);
-            this.kryptonPanel8.Controls.Add(this.Tb_DummyQty);
-            this.kryptonPanel8.Controls.Add(this.label14);
-            this.kryptonPanel8.Controls.Add(this.kryptonDataGridView1);
-            this.kryptonPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel8.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel8.Name = "kryptonPanel8";
-            this.kryptonPanel8.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel8.Size = new System.Drawing.Size(1039, 544);
-            this.kryptonPanel8.TabIndex = 0;
-            // 
-            // Tb_DummyQty
-            // 
-            this.Tb_DummyQty.Location = new System.Drawing.Point(27, 50);
-            this.Tb_DummyQty.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Tb_DummyQty.Name = "Tb_DummyQty";
-            this.Tb_DummyQty.Palette = this.TemplateUI;
-            this.Tb_DummyQty.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.Tb_DummyQty.Size = new System.Drawing.Size(406, 45);
-            this.Tb_DummyQty.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.Tb_DummyQty.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.Tb_DummyQty.StateCommon.Border.Rounding = 30;
-            this.Tb_DummyQty.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Tb_DummyQty.TabIndex = 99;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.BackColor = System.Drawing.Color.Transparent;
-            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.label14.ForeColor = System.Drawing.Color.Black;
-            this.label14.Location = new System.Drawing.Point(34, 17);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(190, 24);
-            this.label14.TabIndex = 96;
-            this.label14.Text = "Set Dummy Quantity :";
-            // 
-            // kryptonDataGridView1
-            // 
-            this.kryptonDataGridView1.AllowUserToAddRows = false;
-            this.kryptonDataGridView1.AllowUserToDeleteRows = false;
-            this.kryptonDataGridView1.ColumnHeadersHeight = 40;
-            this.kryptonDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.serialNumber});
-            this.kryptonDataGridView1.Location = new System.Drawing.Point(27, 115);
-            this.kryptonDataGridView1.Name = "kryptonDataGridView1";
-            this.kryptonDataGridView1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonDataGridView1.RowHeadersWidth = 51;
-            this.kryptonDataGridView1.Size = new System.Drawing.Size(992, 393);
-            this.kryptonDataGridView1.StateCommon.Background.Color1 = System.Drawing.Color.White;
-            this.kryptonDataGridView1.StateCommon.Background.Color2 = System.Drawing.Color.White;
-            this.kryptonDataGridView1.StateCommon.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateCommon.BackStyle = ComponentFactory.Krypton.Toolkit.PaletteBackStyle.GridBackgroundList;
-            this.kryptonDataGridView1.StateCommon.DataCell.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateCommon.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView1.StateCommon.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateCommon.HeaderRow.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateNormal.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.StateNormal.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateNormal.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView1.StateNormal.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView1.StateNormal.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView1.TabIndex = 95;
-            // 
-            // serialNumber
-            // 
-            this.serialNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.serialNumber.HeaderText = "Serial Number";
-            this.serialNumber.Name = "serialNumber";
-            // 
-            // kryptonPage4
-            // 
-            this.kryptonPage4.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.kryptonPage4.Controls.Add(this.kryptonPanel9);
-            this.kryptonPage4.Flags = 65534;
-            this.kryptonPage4.LastVisibleSet = true;
-            this.kryptonPage4.MinimumSize = new System.Drawing.Size(50, 50);
-            this.kryptonPage4.Name = "kryptonPage4";
-            this.kryptonPage4.Size = new System.Drawing.Size(1039, 544);
-            this.kryptonPage4.Text = "Finish Good Record";
-            this.kryptonPage4.ToolTipTitle = "Page ToolTip";
-            this.kryptonPage4.UniqueName = "CAEAF24E4B7B4E1F58A60A81E6387A42";
-            // 
-            // kryptonPanel9
-            // 
-            this.kryptonPanel9.Controls.Add(this.lblLoading);
-            this.kryptonPanel9.Controls.Add(this.Tb_FinishedGoodCounter);
-            this.kryptonPanel9.Controls.Add(this.label1);
-            this.kryptonPanel9.Controls.Add(this.lblPo);
-            this.kryptonPanel9.Controls.Add(this.kryptonDataGridView2);
-            this.kryptonPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel9.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel9.Name = "kryptonPanel9";
-            this.kryptonPanel9.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
-            this.kryptonPanel9.Size = new System.Drawing.Size(1039, 544);
-            this.kryptonPanel9.TabIndex = 0;
-            // 
-            // lblLoading
-            // 
-            this.lblLoading.AutoSize = true;
-            this.lblLoading.BackColor = System.Drawing.Color.Yellow;
-            this.lblLoading.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoading.Location = new System.Drawing.Point(34, 21);
-            this.lblLoading.Name = "lblLoading";
-            this.lblLoading.Size = new System.Drawing.Size(121, 20);
-            this.lblLoading.TabIndex = 109;
-            this.lblLoading.Text = "Loading Data ...";
-            this.lblLoading.Visible = false;
-            // 
-            // Tb_FinishedGoodCounter
-            // 
-            this.Tb_FinishedGoodCounter.Enabled = false;
-            this.Tb_FinishedGoodCounter.Location = new System.Drawing.Point(211, 511);
-            this.Tb_FinishedGoodCounter.Name = "Tb_FinishedGoodCounter";
-            this.Tb_FinishedGoodCounter.Size = new System.Drawing.Size(285, 31);
-            this.Tb_FinishedGoodCounter.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.Tb_FinishedGoodCounter.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Tb_FinishedGoodCounter.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Tb_FinishedGoodCounter.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.Tb_FinishedGoodCounter.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.Tb_FinishedGoodCounter.StateCommon.Border.Rounding = 15;
-            this.Tb_FinishedGoodCounter.StateCommon.Border.Width = 1;
-            this.Tb_FinishedGoodCounter.StateCommon.Content.Color1 = System.Drawing.Color.Gray;
-            this.Tb_FinishedGoodCounter.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.Tb_FinishedGoodCounter.StateCommon.Content.Padding = new System.Windows.Forms.Padding(0);
-            this.Tb_FinishedGoodCounter.TabIndex = 108;
-            this.Tb_FinishedGoodCounter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.White;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Black;
-            this.label1.Location = new System.Drawing.Point(39, 511);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(147, 21);
-            this.label1.TabIndex = 98;
-            this.label1.Text = "Total Serial Number";
-            // 
-            // lblPo
-            // 
-            this.lblPo.AutoSize = true;
-            this.lblPo.BackColor = System.Drawing.Color.White;
-            this.lblPo.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPo.ForeColor = System.Drawing.Color.Black;
-            this.lblPo.Location = new System.Drawing.Point(33, 57);
-            this.lblPo.Name = "lblPo";
-            this.lblPo.Size = new System.Drawing.Size(200, 25);
-            this.lblPo.TabIndex = 97;
-            this.lblPo.Text = "Serial Number of PO:";
-            // 
-            // kryptonDataGridView2
-            // 
-            this.kryptonDataGridView2.AllowUserToAddRows = false;
-            this.kryptonDataGridView2.AllowUserToDeleteRows = false;
-            this.kryptonDataGridView2.AutoGenerateColumns = false;
-            this.kryptonDataGridView2.ColumnHeadersHeight = 40;
-            this.kryptonDataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.idDataGridViewTextBoxColumn,
-            this.serialNumberDataGridViewTextBoxColumn,
-            this.controlPointDataGridViewTextBoxColumn});
-            this.kryptonDataGridView2.DataSource = this.bindingSource1;
-            this.kryptonDataGridView2.Location = new System.Drawing.Point(34, 97);
-            this.kryptonDataGridView2.Name = "kryptonDataGridView2";
-            this.kryptonDataGridView2.Palette = this.TemplateUI;
-            this.kryptonDataGridView2.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.kryptonDataGridView2.ReadOnly = true;
-            this.kryptonDataGridView2.RowHeadersWidth = 51;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.Transparent;
-            this.kryptonDataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle3;
-            this.kryptonDataGridView2.RowTemplate.Height = 40;
-            this.kryptonDataGridView2.Size = new System.Drawing.Size(933, 380);
-            this.kryptonDataGridView2.StateCommon.Background.Color1 = System.Drawing.Color.White;
-            this.kryptonDataGridView2.StateCommon.Background.Color2 = System.Drawing.Color.White;
-            this.kryptonDataGridView2.StateCommon.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateCommon.BackStyle = ComponentFactory.Krypton.Toolkit.PaletteBackStyle.GridBackgroundList;
-            this.kryptonDataGridView2.StateCommon.DataCell.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateCommon.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView2.StateCommon.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateCommon.HeaderColumn.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.HeaderColumn.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.HeaderColumn.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView2.StateCommon.HeaderColumn.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateCommon.HeaderRow.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateCommon.HeaderRow.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.HeaderRow.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateCommon.HeaderRow.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView2.StateCommon.HeaderRow.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateNormal.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.StateNormal.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateNormal.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.kryptonDataGridView2.StateNormal.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonDataGridView2.StateNormal.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
-            this.kryptonDataGridView2.TabIndex = 96;
-            // 
-            // TimerRealtime
-            // 
-            this.TimerRealtime.Enabled = true;
-            this.TimerRealtime.Interval = 5000;
-            this.TimerRealtime.Tick += new System.EventHandler(this.TimerRealtime_Tick);
-            // 
-            // idDataGridViewTextBoxColumn
-            // 
-            this.idDataGridViewTextBoxColumn.DataPropertyName = "Id";
-            this.idDataGridViewTextBoxColumn.HeaderText = "No";
-            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
-            this.idDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // serialNumberDataGridViewTextBoxColumn
-            // 
-            this.serialNumberDataGridViewTextBoxColumn.DataPropertyName = "SerialNumber";
-            this.serialNumberDataGridViewTextBoxColumn.HeaderText = "Serial Number";
-            this.serialNumberDataGridViewTextBoxColumn.Name = "serialNumberDataGridViewTextBoxColumn";
-            this.serialNumberDataGridViewTextBoxColumn.ReadOnly = true;
-            this.serialNumberDataGridViewTextBoxColumn.Width = 200;
-            // 
-            // controlPointDataGridViewTextBoxColumn
-            // 
-            this.controlPointDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.controlPointDataGridViewTextBoxColumn.DataPropertyName = "ControlPoint";
-            this.controlPointDataGridViewTextBoxColumn.HeaderText = "Control Point";
-            this.controlPointDataGridViewTextBoxColumn.Name = "controlPointDataGridViewTextBoxColumn";
-            this.controlPointDataGridViewTextBoxColumn.ReadOnly = true;
-            this.controlPointDataGridViewTextBoxColumn.Width = 99;
-            // 
-            // bindingSource1
-            // 
-            this.bindingSource1.DataSource = typeof(MesData.FinishedGood);
+            this.panel1.Controls.Add(this.btnSetLaserTime);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Controls.Add(this.Tb_TimeOffset);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 437);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1033, 104);
+            this.panel1.TabIndex = 90;
             // 
             // btnSetLaserTime
             // 
             this.btnSetLaserTime.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSetLaserTime.Location = new System.Drawing.Point(449, 482);
+            this.btnSetLaserTime.Location = new System.Drawing.Point(445, 48);
             this.btnSetLaserTime.Name = "btnSetLaserTime";
             this.btnSetLaserTime.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(67)))), ((int)(((byte)(228)))));
             this.btnSetLaserTime.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(67)))), ((int)(((byte)(228)))));
@@ -2350,10 +2059,167 @@ namespace LaserPrinting
             this.btnSetLaserTime.Values.Text = "Set Laser Time Offset";
             this.btnSetLaserTime.Click += new System.EventHandler(this.btnSetLaserTime_Click);
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.Transparent;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
+            this.label6.ForeColor = System.Drawing.Color.Black;
+            this.label6.Location = new System.Drawing.Point(30, 15);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(188, 24);
+            this.label6.TabIndex = 100;
+            this.label6.Text = "Set Laser Time Offset";
+            // 
+            // Tb_TimeOffset
+            // 
+            this.Tb_TimeOffset.DecimalPlaces = 1;
+            this.Tb_TimeOffset.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.Tb_TimeOffset.InterceptArrowKeys = false;
+            this.Tb_TimeOffset.Location = new System.Drawing.Point(23, 48);
+            this.Tb_TimeOffset.Maximum = new decimal(new int[] {
+            24,
+            0,
+            0,
+            0});
+            this.Tb_TimeOffset.Minimum = new decimal(new int[] {
+            24,
+            0,
+            0,
+            -2147483648});
+            this.Tb_TimeOffset.Name = "Tb_TimeOffset";
+            this.Tb_TimeOffset.Palette = this.TemplateUI;
+            this.Tb_TimeOffset.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
+            this.Tb_TimeOffset.Size = new System.Drawing.Size(406, 45);
+            this.Tb_TimeOffset.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.Tb_TimeOffset.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.Tb_TimeOffset.StateCommon.Border.Rounding = 30;
+            this.Tb_TimeOffset.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Tb_TimeOffset.TabIndex = 102;
+            // 
+            // kryptonPage3
+            // 
+            this.kryptonPage3.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
+            this.kryptonPage3.Controls.Add(this.kryptonPanel8);
+            this.kryptonPage3.Flags = 65534;
+            this.kryptonPage3.LastVisibleSet = true;
+            this.kryptonPage3.MinimumSize = new System.Drawing.Size(50, 50);
+            this.kryptonPage3.Name = "kryptonPage3";
+            this.kryptonPage3.Size = new System.Drawing.Size(1039, 543);
+            this.kryptonPage3.Text = "Quality";
+            this.kryptonPage3.ToolTipTitle = "Page ToolTip";
+            this.kryptonPage3.UniqueName = "93024F31D9FB40C23D948F5CF665302C";
+            // 
+            // kryptonPanel8
+            // 
+            this.kryptonPanel8.Controls.Add(this.tableLayoutPanel6);
+            this.kryptonPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonPanel8.Location = new System.Drawing.Point(0, 0);
+            this.kryptonPanel8.Name = "kryptonPanel8";
+            this.kryptonPanel8.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
+            this.kryptonPanel8.Size = new System.Drawing.Size(1039, 543);
+            this.kryptonPanel8.TabIndex = 0;
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Controls.Add(this.kryptonDataGridView1, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.panel4, 0, 0);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 2;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(1039, 543);
+            this.tableLayoutPanel6.TabIndex = 105;
+            // 
+            // kryptonDataGridView1
+            // 
+            this.kryptonDataGridView1.AllowUserToAddRows = false;
+            this.kryptonDataGridView1.AllowUserToDeleteRows = false;
+            this.kryptonDataGridView1.ColumnHeadersHeight = 40;
+            this.kryptonDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.serialNumber});
+            this.kryptonDataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonDataGridView1.Location = new System.Drawing.Point(3, 118);
+            this.kryptonDataGridView1.Name = "kryptonDataGridView1";
+            this.kryptonDataGridView1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
+            this.kryptonDataGridView1.RowHeadersWidth = 51;
+            this.kryptonDataGridView1.Size = new System.Drawing.Size(1033, 422);
+            this.kryptonDataGridView1.StateCommon.Background.Color1 = System.Drawing.Color.White;
+            this.kryptonDataGridView1.StateCommon.Background.Color2 = System.Drawing.Color.White;
+            this.kryptonDataGridView1.StateCommon.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateCommon.BackStyle = ComponentFactory.Krypton.Toolkit.PaletteBackStyle.GridBackgroundList;
+            this.kryptonDataGridView1.StateCommon.DataCell.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateCommon.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.kryptonDataGridView1.StateCommon.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.kryptonDataGridView1.StateCommon.HeaderColumn.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateCommon.HeaderRow.Back.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.kryptonDataGridView1.StateCommon.HeaderRow.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateNormal.Background.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.StateNormal.DataCell.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateNormal.DataCell.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.kryptonDataGridView1.StateNormal.DataCell.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.kryptonDataGridView1.StateNormal.DataCell.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.kryptonDataGridView1.TabIndex = 95;
+            // 
+            // serialNumber
+            // 
+            this.serialNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.serialNumber.HeaderText = "Serial Number";
+            this.serialNumber.Name = "serialNumber";
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.label14);
+            this.panel4.Controls.Add(this.btnSetDummyQty);
+            this.panel4.Controls.Add(this.Tb_DummyQty);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel4.Location = new System.Drawing.Point(3, 3);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(1033, 109);
+            this.panel4.TabIndex = 96;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.BackColor = System.Drawing.Color.Transparent;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
+            this.label14.ForeColor = System.Drawing.Color.Black;
+            this.label14.Location = new System.Drawing.Point(23, 14);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(190, 24);
+            this.label14.TabIndex = 96;
+            this.label14.Text = "Set Dummy Quantity :";
+            // 
             // btnSetDummyQty
             // 
             this.btnSetDummyQty.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSetDummyQty.Location = new System.Drawing.Point(464, 49);
+            this.btnSetDummyQty.Location = new System.Drawing.Point(453, 46);
             this.btnSetDummyQty.Name = "btnSetDummyQty";
             this.btnSetDummyQty.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(67)))), ((int)(((byte)(228)))));
             this.btnSetDummyQty.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(67)))), ((int)(((byte)(228)))));
@@ -2403,6 +2269,168 @@ namespace LaserPrinting
             this.btnSetDummyQty.StateTracking.Border.Width = 1;
             this.btnSetDummyQty.TabIndex = 104;
             this.btnSetDummyQty.Values.Text = "Set Dummy Quantity";
+            this.btnSetDummyQty.Click += new System.EventHandler(this.btnSetDummyQty_Click);
+            // 
+            // Tb_DummyQty
+            // 
+            this.Tb_DummyQty.Location = new System.Drawing.Point(16, 47);
+            this.Tb_DummyQty.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Tb_DummyQty.Name = "Tb_DummyQty";
+            this.Tb_DummyQty.Palette = this.TemplateUI;
+            this.Tb_DummyQty.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
+            this.Tb_DummyQty.Size = new System.Drawing.Size(406, 45);
+            this.Tb_DummyQty.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.Tb_DummyQty.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.Tb_DummyQty.StateCommon.Border.Rounding = 30;
+            this.Tb_DummyQty.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Tb_DummyQty.TabIndex = 99;
+            // 
+            // kryptonPage4
+            // 
+            this.kryptonPage4.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
+            this.kryptonPage4.Controls.Add(this.kryptonPanel9);
+            this.kryptonPage4.Flags = 65534;
+            this.kryptonPage4.LastVisibleSet = true;
+            this.kryptonPage4.MinimumSize = new System.Drawing.Size(50, 50);
+            this.kryptonPage4.Name = "kryptonPage4";
+            this.kryptonPage4.Size = new System.Drawing.Size(1039, 543);
+            this.kryptonPage4.Text = "Finish Good Record";
+            this.kryptonPage4.ToolTipTitle = "Page ToolTip";
+            this.kryptonPage4.UniqueName = "CAEAF24E4B7B4E1F58A60A81E6387A42";
+            // 
+            // kryptonPanel9
+            // 
+            this.kryptonPanel9.Controls.Add(this.tableLayoutPanel8);
+            this.kryptonPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonPanel9.Location = new System.Drawing.Point(0, 0);
+            this.kryptonPanel9.Name = "kryptonPanel9";
+            this.kryptonPanel9.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
+            this.kryptonPanel9.Size = new System.Drawing.Size(1039, 543);
+            this.kryptonPanel9.TabIndex = 0;
+            // 
+            // tableLayoutPanel8
+            // 
+            this.tableLayoutPanel8.ColumnCount = 1;
+            this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel8.Controls.Add(this.panel2, 0, 0);
+            this.tableLayoutPanel8.Controls.Add(this.kryptonDataGridView2, 0, 1);
+            this.tableLayoutPanel8.Controls.Add(this.panel3, 0, 2);
+            this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel8.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel8.Name = "tableLayoutPanel8";
+            this.tableLayoutPanel8.RowCount = 3;
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(1039, 543);
+            this.tableLayoutPanel8.TabIndex = 115;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.lblLoading);
+            this.panel2.Controls.Add(this.lblPo);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 3);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1033, 56);
+            this.panel2.TabIndex = 0;
+            // 
+            // lblLoading
+            // 
+            this.lblLoading.AutoSize = true;
+            this.lblLoading.BackColor = System.Drawing.Color.Yellow;
+            this.lblLoading.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLoading.Location = new System.Drawing.Point(10, 4);
+            this.lblLoading.Name = "lblLoading";
+            this.lblLoading.Size = new System.Drawing.Size(121, 20);
+            this.lblLoading.TabIndex = 111;
+            this.lblLoading.Text = "Loading Data ...";
+            this.lblLoading.Visible = false;
+            // 
+            // lblPo
+            // 
+            this.lblPo.AutoSize = true;
+            this.lblPo.BackColor = System.Drawing.Color.White;
+            this.lblPo.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPo.ForeColor = System.Drawing.Color.Black;
+            this.lblPo.Location = new System.Drawing.Point(9, 24);
+            this.lblPo.Name = "lblPo";
+            this.lblPo.Size = new System.Drawing.Size(200, 25);
+            this.lblPo.TabIndex = 110;
+            this.lblPo.Text = "Serial Number of PO:";
+            // 
+            // kryptonDataGridView2
+            // 
+            this.kryptonDataGridView2.AllowUserToAddRows = false;
+            this.kryptonDataGridView2.AllowUserToDeleteRows = false;
+            this.kryptonDataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.kryptonDataGridView2.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.kryptonDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.kryptonDataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonDataGridView2.Location = new System.Drawing.Point(3, 65);
+            this.kryptonDataGridView2.Name = "kryptonDataGridView2";
+            this.kryptonDataGridView2.ReadOnly = true;
+            this.kryptonDataGridView2.Size = new System.Drawing.Size(1033, 425);
+            this.kryptonDataGridView2.TabIndex = 0;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.label28);
+            this.panel3.Controls.Add(this.Tb_FinishedGoodCounter);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Location = new System.Drawing.Point(3, 496);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(1033, 44);
+            this.panel3.TabIndex = 1;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.BackColor = System.Drawing.Color.White;
+            this.label28.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label28.ForeColor = System.Drawing.Color.Black;
+            this.label28.Location = new System.Drawing.Point(11, 11);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(128, 19);
+            this.label28.TabIndex = 112;
+            this.label28.Text = "Total Serial Number";
+            // 
+            // Tb_FinishedGoodCounter
+            // 
+            this.Tb_FinishedGoodCounter.Enabled = false;
+            this.Tb_FinishedGoodCounter.Location = new System.Drawing.Point(145, 6);
+            this.Tb_FinishedGoodCounter.Name = "Tb_FinishedGoodCounter";
+            this.Tb_FinishedGoodCounter.Size = new System.Drawing.Size(285, 33);
+            this.Tb_FinishedGoodCounter.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.Tb_FinishedGoodCounter.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Tb_FinishedGoodCounter.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Tb_FinishedGoodCounter.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.Tb_FinishedGoodCounter.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.Tb_FinishedGoodCounter.StateCommon.Border.Rounding = 20;
+            this.Tb_FinishedGoodCounter.StateCommon.Border.Width = 1;
+            this.Tb_FinishedGoodCounter.StateCommon.Content.Color1 = System.Drawing.Color.Gray;
+            this.Tb_FinishedGoodCounter.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.Tb_FinishedGoodCounter.StateCommon.Content.Padding = new System.Windows.Forms.Padding(0);
+            this.Tb_FinishedGoodCounter.TabIndex = 113;
+            this.Tb_FinishedGoodCounter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // bindingSource1
+            // 
+            this.bindingSource1.DataSource = typeof(MesData.FinishedGood);
+            // 
+            // TimerRealtime
+            // 
+            this.TimerRealtime.Enabled = true;
+            this.TimerRealtime.Interval = 5000;
+            this.TimerRealtime.Tick += new System.EventHandler(this.TimerRealtime_Tick);
             // 
             // MainAuto24
             // 
@@ -2426,7 +2454,11 @@ namespace LaserPrinting
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).EndInit();
             this.kryptonPanel4.ResumeLayout(false);
-            this.kryptonPanel4.PerformLayout();
+            this.tableLayoutPanel9.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel10)).EndInit();
+            this.kryptonPanel10.ResumeLayout(false);
+            this.kryptonPanel10.PerformLayout();
+            this.panel5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
@@ -2455,7 +2487,7 @@ namespace LaserPrinting
             this.kryptonPanel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage2)).EndInit();
             this.kryptonPage2.ResumeLayout(false);
-            this.kryptonPage2.PerformLayout();
+            this.tableLayoutPanel5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Dg_Maintenance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.getMaintenanceStatusDetailsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResourceSetupGrouping.Panel)).EndInit();
@@ -2465,18 +2497,26 @@ namespace LaserPrinting
             this.ResourceSetupGrouping.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Cb_StatusCode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Cb_StatusReason)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage3)).EndInit();
             this.kryptonPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel8)).EndInit();
             this.kryptonPanel8.ResumeLayout(false);
-            this.kryptonPanel8.PerformLayout();
+            this.tableLayoutPanel6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView1)).EndInit();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPage4)).EndInit();
             this.kryptonPage4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel9)).EndInit();
             this.kryptonPanel9.ResumeLayout(false);
-            this.kryptonPanel9.PerformLayout();
+            this.tableLayoutPanel8.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView2)).EndInit();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.ResumeLayout(false);
 
@@ -2518,7 +2558,6 @@ namespace LaserPrinting
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_ArticleNumber;
         private ComponentFactory.Krypton.Toolkit.KryptonButton btnCallMaintenance;
         private ComponentFactory.Krypton.Toolkit.KryptonButton btnFinishPreparation;
-        private ComponentFactory.Krypton.Toolkit.KryptonButton btnEndProduction;
         private ComponentFactory.Krypton.Toolkit.KryptonGroupBox ResourceSetupGrouping;
         private System.Windows.Forms.Label label23;
         private ComponentFactory.Krypton.Toolkit.KryptonComboBox Cb_StatusCode;
@@ -2532,18 +2571,10 @@ namespace LaserPrinting
         private System.Windows.Forms.Label label14;
         private ComponentFactory.Krypton.Toolkit.KryptonDataGridView kryptonDataGridView1;
         private ComponentFactory.Krypton.Toolkit.KryptonPanel kryptonPanel9;
-        private ComponentFactory.Krypton.Toolkit.KryptonDataGridView kryptonDataGridView2;
         private System.Windows.Forms.Timer TimerRealtime;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lblPo;
-        private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_FinishedGoodCounter;
         private System.Windows.Forms.BindingSource bindingSource1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn serialNumberDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn controlPointDataGridViewTextBoxColumn;
         private ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown Tb_DummyQty;
         private System.Windows.Forms.DataGridViewTextBoxColumn serialNumber;
-        private System.Windows.Forms.Label lblLoading;
         private ComponentFactory.Krypton.Toolkit.KryptonNumericUpDown Tb_TimeOffset;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.BindingSource getMaintenanceStatusDetailsBindingSource;
@@ -2593,7 +2624,6 @@ namespace LaserPrinting
         private System.Windows.Forms.DataGridViewTextBoxColumn listItemIndexDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn keyDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn cDOTypeNameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.PictureBox Logo;
         private System.Windows.Forms.PictureBox pbProduct;
         private System.Windows.Forms.Label lbMoveOut;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_SerialNumber;
@@ -2607,9 +2637,26 @@ namespace LaserPrinting
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label20;
         private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_StatusCode;
-        private System.Windows.Forms.Label lbTitle;
-        private System.Windows.Forms.Label MyTitle;
         private ComponentFactory.Krypton.Toolkit.KryptonButton btnSetLaserTime;
         private ComponentFactory.Krypton.Toolkit.KryptonButton btnSetDummyQty;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label lblLoading;
+        private System.Windows.Forms.Label lblPo;
+        private ComponentFactory.Krypton.Toolkit.KryptonDataGridView kryptonDataGridView2;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label label28;
+        private ComponentFactory.Krypton.Toolkit.KryptonTextBox Tb_FinishedGoodCounter;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
+        private ComponentFactory.Krypton.Toolkit.KryptonPanel kryptonPanel10;
+        private System.Windows.Forms.Label lblResMaintMesg;
+        private System.Windows.Forms.Label lbTitle;
+        private System.Windows.Forms.Label MyTitle;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.PictureBox Logo;
     }
 }

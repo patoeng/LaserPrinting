@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Ariel</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;MiniMe</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -223,6 +223,10 @@
     <ProjectReference Include="..\..\MesData\MesData\MesData.csproj">
       <Project>{47a21ecb-4762-4320-8946-4a7226c0085b}</Project>
       <Name>MesData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PopUpMessage\PopUpMessage.csproj">
+      <Project>{b76a9d91-dc94-4a5e-b1ec-4037fe481761}</Project>
+      <Name>PopUpMessage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

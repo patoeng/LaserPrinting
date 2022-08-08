@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace LaserPrinting.Services
 {
@@ -21,6 +23,10 @@ namespace LaserPrinting.Services
         
 
         private FileSystemWatcher _fileSystemWatcher;
+        private Timer _timerDelayFileChanged;
+        private string _fileName;
+        private int _counter;
+        private bool _delayActive;
 
         public void InitFileWatcher(string fileLocation, string filePattern)
         {
@@ -37,15 +43,40 @@ namespace LaserPrinting.Services
             };
             _fileSystemWatcher.Changed += FileWatcherOnChanged;
             _fileSystemWatcher.EnableRaisingEvents = true;
+            _timerDelayFileChanged = new Timer();
+            _timerDelayFileChanged.Interval = 100;
+            _timerDelayFileChanged.Tick += TimerDelayFileChangedTicked;
+            _timerDelayFileChanged.Start();
+        
+    }
+
+        private async void TimerDelayFileChangedTicked(object sender, EventArgs e)
+        {
+            if (_delayActive)
+            {
+                _counter++;
+                if (_counter > 6)
+                {
+                    _delayActive = false;
+                    await FileWatcherOnChangedDelayed();
+                }
+            }
         }
 
-        private async void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        {
+            _fileName = e.FullPath;
+            _counter = 0;
+            _delayActive = true;
+        }
+
+        private async Task FileWatcherOnChangedDelayed()
         {
             if (Busy) return;
             Busy = true;
             if (FileChangedDetected != null)
             {
-                var s =await Task.Run(()=> FileChangedDetected?.Invoke(e.FullPath)) ;
+                var s =await Task.Run(()=> FileChangedDetected?.Invoke(_fileName)) ;
             }
             Busy = false;
         }

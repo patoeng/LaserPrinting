@@ -11,9 +11,6 @@
     <Setting Name="DatalogFileDatabaseLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">DatalogFile.db</Value>
     </Setting>
-    <Setting Name="WorkFlow" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Ariel Workflow</Value>
-    </Setting>
     <Setting Name="DummyQty" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
@@ -22,6 +19,9 @@
     </Setting>
     <Setting Name="TimeOffset" Type="System.Double" Scope="User">
       <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="WorkFlow" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Minime Workflow</Value>
     </Setting>
   </Settings>
 </SettingsFile>

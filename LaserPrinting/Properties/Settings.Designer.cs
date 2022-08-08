@@ -50,15 +50,6 @@ namespace LaserPrinting.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Ariel Workflow")]
-        public string WorkFlow {
-            get {
-                return ((string)(this["WorkFlow"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3")]
@@ -89,6 +80,15 @@ namespace LaserPrinting.Properties {
             }
             set {
                 this["TimeOffset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Minime Workflow")]
+        public string WorkFlow {
+            get {
+                return ((string)(this["WorkFlow"]));
             }
         }
     }
