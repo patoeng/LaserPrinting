@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,9 @@ namespace LaserPrinting
         private int _indexMaintenanceState;
         private Timer _timerDelayFileChanged;
         private string _fileName;
+        private int _unitCount;
+        private string _recordId;
+        private List<string> _containerList;
 
         public MainAuto24()
         {
@@ -126,12 +130,14 @@ namespace LaserPrinting
            // ThreadHelper.ControlSetText(Tb_Message, "");
             if (_mesData.ManufacturingOrder == null)
             {
+                EventLogUtil.LogEvent("Manufacturing Order not loaded!",EventLogEntryType.Warning);
                 KryptonMessageBox.Show($"Manufacturing Order not loaded!", "File Watcher",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             if (_mesData.ResourceStatusDetails == null || _mesData.ResourceStatusDetails?.Availability != "Up")
             {
+                EventLogUtil.LogEvent("Resource status is not in UP condition!", EventLogEntryType.Warning);
                 KryptonMessageBox.Show($"Resource status is not in UP condition!", "File Watcher",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -140,6 +146,7 @@ namespace LaserPrinting
             var transPastDue = Mes.GetMaintenancePastDue(_mesData.MaintenanceStatusDetails);
             if (transPastDue.Result && transPastDue.Data != null)
             {
+                EventLogUtil.LogEvent("This resource under maintenance, need to complete!", EventLogEntryType.Warning);
                 KryptonMessageBox.Show(this, "This resource under maintenance, need to complete!", "Move In",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -173,6 +180,7 @@ namespace LaserPrinting
                 }
                 PopUpMessageHelper.CloseAll();
                 var s = await StartMoveInMove(sn);
+
             }
             return true;
         }
@@ -182,18 +190,21 @@ namespace LaserPrinting
             if (_watcher.Busy)
             {
                 MessageBox.Show("Datalog Parsing In Progress");
+                Bt_SetMfgOrder.Enabled = true;
                 return false;
             }
             if (_mesData.ResourceStatusDetails == null ||_mesData.ResourceStatusDetails?.Availability != "Up" && _mesData.ResourceStatusDetails?.Reason?.Name!="Setting")
             {
                 MessageBox.Show("Canceled, Resource is not in \"Up\" condition.");
-                return false;
+                Bt_SetMfgOrder.Enabled = true;
+                 return false;
             }
             var mfg = await Mes.GetMfgOrder(_mesData, Tb_MfgOrder.Text);
-            _mesData.SetManufacturingOrder(mfg);
+           
 
-            if (_mesData.ManufacturingOrder != null)
+            if (mfg != null)
             {
+                _mesData.SetManufacturingOrder(mfg);
                 ClearTextBox();
                 var setting = new Settings();
                 _dataLocalPo = $"{setting.DataLocation}\\{_mesData.ManufacturingOrder.Name}.json";
@@ -238,21 +249,36 @@ namespace LaserPrinting
                     {
                         pbProduct.ImageLocation = opecImage.Identifier.ToString();
                     }
-                    var count = await Mes.GetCounterFromMfgOrder(_mesData);
-                    Tb_LaserQty.Text = count.ToString();
-                    if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && !_currentPo.PreparationFinished)
-                    {
-                        await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
-                        await GetStatusOfResource();
-                    }
+                }
+                _recordId = _mesData.ManufacturingOrder.Name?.Value + _mesData.ResourceName;
+                IResourceCounter data2 = await Mes.GetMfgResourceCounterCached(_mesData, _recordId);
+                if (data2 != null)
+                {
+                    _unitCount = data2.TotalCounter;
+                }
+                else
+                {
+                    _unitCount = await Mes.GetCounterFromMfgOrder(_mesData);
+                }
+                Tb_LaserQty.Text = _unitCount.ToString();
+              
+                _containerList = new List<string>();
+                foreach (var item in mfg.Containers)
+                {
+                    _containerList.Add(item.Value);
+                }
+               
+                if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && !_currentPo.PreparationFinished)
+                {
+                    await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
+                    await GetStatusOfResource();
                 }
 
+                await GetFinishedGoodRecord();
                 return true;
             }
-            else
-            {
-                MessageBox.Show(@"Manufacturing Order is not found!");
-            }
+
+            MessageBox.Show(@"Manufacturing Order is not found!");
 
             return false;
         }
@@ -275,7 +301,21 @@ namespace LaserPrinting
                 ThreadHelper.ControlSetText(lbMoveOut, "");
 
                 var resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgQty.Text, dMoveIn);
+                int y = 0;
+                while (!resultStart.Result && y < 9)
+                {
+                    await Task.Delay(250);
+                    y++;
+                    resultStart = await Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name, _mesData.WorkFlow, Tb_MfgQty.Text, dMoveIn);
+                }
+
                 if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
+                var oContainerStatus = await Mes.GetCurrentContainerStep(_mesData, product.Barcode);
+                await Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
+                if (!_containerList.Contains(product.Barcode))
+                {
+                    _containerList.Add(product.Barcode);
+                }
 
                 var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
@@ -330,12 +370,17 @@ namespace LaserPrinting
                     }
 
                     var t = await Mes.ExecuteContainerAttrMaint(_mesData, product.Barcode, cAttributes);
+                    oContainerStatus = await Mes.GetCurrentContainerStep(_mesData, product.Barcode);
+                    await Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
 
-                    await Mes.UpdateCounter(_mesData, 1);
-                    var mfg = await Mes.GetMfgOrder(_mesData, _mesData.ManufacturingOrder.Name.ToString());
-                    _mesData.SetManufacturingOrder(mfg);
-                    var count = await Mes.GetCounterFromMfgOrder(_mesData);
-                    ThreadHelper.ControlSetText(Tb_LaserQty, count.ToString());
+                    IResourceCounter data2 = await Mes.GetMfgResourceCounterCached(_mesData, _recordId);
+                    if (data2 != null)
+                    {
+                        _unitCount = data2.TotalCounter;
+                    }
+                    _unitCount++;
+                    ThreadHelper.ControlSetText(Tb_LaserQty, _unitCount.ToString());
+                    await Mes.SaveMfgResourceCounterCached(_mesData, _unitCount, _mesData.ManufacturingOrder.Name?.Value);
                 }
                 return resultMoveStd.Result ? "Container success to Start, MoveIn and Moved Std" : $"Container success to Start and MoveIn but failed to Moved Std. {resultMoveStd.Message}";
             }
@@ -351,10 +396,9 @@ namespace LaserPrinting
             try
             {
                 var resourceStatus = await Mes.GetResourceStatusDetails(_mesData);
-                _mesData.SetResourceStatusDetails(resourceStatus);
-
                 if (resourceStatus != null)
                 {
+                    _mesData.SetResourceStatusDetails(resourceStatus);
                     if (resourceStatus.Status != null) Tb_StatusCode.Text = resourceStatus.Reason?.Name;
                     if (resourceStatus.Availability != null)
                     {
@@ -387,10 +431,9 @@ namespace LaserPrinting
             try
             {
                 var resourceStatus = await Mes.GetResourceStatusDetails(_mesData);
-                _mesData.SetResourceStatusDetails(resourceStatus);
-
                 if (resourceStatus != null)
                 {
+                    _mesData.SetResourceStatusDetails(resourceStatus);
                     if (_mesData.ResourceStatusDetails?.Reason?.Name != "Quality Inspection")
                     {
                         btnFinishPreparation.Enabled = true;
@@ -619,11 +662,28 @@ namespace LaserPrinting
 
         private async void Bt_SetMfgOrder_Click(object sender, EventArgs e)
         {
+            Bt_SetMfgOrder.Enabled = false;
             var data = Tb_MfgOrder.Text.Trim();
-            if (data.Length<7) return;
-            if (_mesData.ResourceStatusDetails?.Reason?.Name=="Maintenance")return;
+            if (data.Length < 7)
+            {
+                Bt_SetMfgOrder.Enabled = true;
+                return;
+            }
+
+            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance")
+            {
+                Bt_SetMfgOrder.Enabled = true;
+                return;
+            }
+
+            lblLoadingPo.Visible = true;
             var result = await SetMfgOrder();
-            if (!result) return;
+            lblLoadingPo.Visible = false;
+            if (!result)
+            {
+                Bt_SetMfgOrder.Enabled = true;
+                return;
+            }
             _mesData.SetProductionDateStart(DateTime.Now);
             if (_currentPo.ContainerList.Count < _currentPo.DummyQty )
             {
@@ -781,22 +841,18 @@ namespace LaserPrinting
 
         private async Task GetFinishedGoodRecord()
         {
-            var data = await Mes.GetFinishGoodRecord(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+            if (_mesData == null) return;
+
+            var data = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString(), _containerList);
+            if (data == null || data.Length != _containerList.Count)
+            {
+                data = await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+            }
+
             if (data != null)
             {
-                var list = await Mes.ContainerStatusesToFinishedGoodLaser(data);
+                var list = await Mes.IFinishGoodRecordToFinishedGoodLaser(data);
                 bindingSource1.DataSource = new BindingList<FinishedGoodLaser>(list);
-
-                //var wmsNotInHansFilName = @"C:\Users\Precision\Downloads\Laser marking\10000056.CSV";
-                //using (var stream = new StreamWriter(wmsNotInHansFilName))
-                //{
-                //  var i = 0;
-                //    foreach (var wms in list)
-                //    {
-                //        i++;
-                //        await stream.WriteLineAsync($"{i};{wms.LaserMoveOut};{wms.SerialNumber}");
-                //    }
-                //}
 
                 kryptonDataGridView2.DataSource = bindingSource1;
                 Tb_FinishedGoodCounter.Text = list.Length.ToString();
