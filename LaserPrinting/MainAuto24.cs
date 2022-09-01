@@ -16,9 +16,10 @@ using LaserPrinting.Properties;
 using LaserPrinting.Services;
 using MesData;
 using MesData.Login;
+using MesData.UnitCounter;
 using OpcenterWikLibrary;
 using PopUpMessage;
-using Timer = System.Windows.Forms.Timer;
+using Environment = System.Environment;
 
 namespace LaserPrinting
 {
@@ -30,11 +31,8 @@ namespace LaserPrinting
         private LocalProductionOrder _currentPo;
         private string _dataLocalPo;
         private int _indexMaintenanceState;
-        private Timer _timerDelayFileChanged;
-        private string _fileName;
-        private int _unitCount;
-        private string _recordId;
-        private List<string> _containerList;
+        private MesUnitCounter _mesUnitCounter;
+        private bool _allowClose;
 
         public MainAuto24()
         {
@@ -97,6 +95,8 @@ namespace LaserPrinting
 
                 }
             }
+
+           
         }
         private void InitFileWatcher()
         {
@@ -250,31 +250,36 @@ namespace LaserPrinting
                         pbProduct.ImageLocation = opecImage.Identifier.ToString();
                     }
                 }
-                _recordId = _mesData.ManufacturingOrder.Name?.Value + _mesData.ResourceName;
-                IResourceCounter data2 = await Mes.GetMfgResourceCounterCached(_mesData, _recordId);
-                if (data2 != null)
+
+                if (_mesUnitCounter != null)
                 {
-                    _unitCount = data2.TotalCounter;
+                    await _mesUnitCounter.StopPoll();
                 }
-                else
+                _mesUnitCounter = MesUnitCounter.Load(MesUnitCounter.GetFileName(mfg.Name.Value));
+
+                if (!MesUnitCounter.FileExist(mfg.Name.ToString()))
                 {
-                    _unitCount = await Mes.GetCounterFromMfgOrder(_mesData);
+                    var cnt = await Mes.GetCounterFromMfgOrder(_mesData,120000);
+                   _mesUnitCounter.SetActiveMfgOrder(mfg.Name.Value,cnt);
                 }
-                Tb_LaserQty.Text = _unitCount.ToString();
-              
-                _containerList = new List<string>();
-                foreach (var item in mfg.Containers)
-                {
-                    _containerList.Add(item.Value);
-                }
-               
+                _mesUnitCounter.InitPoll(_mesData);
+                _mesUnitCounter.StartPoll();
+                MesUnitCounter.Save(_mesUnitCounter);
+
+                Tb_LaserQty.Text = _mesUnitCounter.Counter.ToString();
+
                 if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && !_currentPo.PreparationFinished)
                 {
                     await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
                     await GetStatusOfResource();
                 }
 
-                await GetFinishedGoodRecord();
+                var inRedis = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+                if (inRedis.Count != mfg.Containers.Length)
+                {
+                    await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+                }
+
                 return true;
             }
 
@@ -312,11 +317,7 @@ namespace LaserPrinting
                 if (!resultStart.Result) return $"Container Start failed. {resultStart.Message}";
                 var oContainerStatus = await Mes.GetCurrentContainerStep(_mesData, product.Barcode);
                 await Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
-                if (!_containerList.Contains(product.Barcode))
-                {
-                    _containerList.Add(product.Barcode);
-                }
-
+              
                 var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                 if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
@@ -373,14 +374,10 @@ namespace LaserPrinting
                     oContainerStatus = await Mes.GetCurrentContainerStep(_mesData, product.Barcode);
                     await Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
 
-                    IResourceCounter data2 = await Mes.GetMfgResourceCounterCached(_mesData, _recordId);
-                    if (data2 != null)
-                    {
-                        _unitCount = data2.TotalCounter;
-                    }
-                    _unitCount++;
-                    ThreadHelper.ControlSetText(Tb_LaserQty, _unitCount.ToString());
-                    await Mes.SaveMfgResourceCounterCached(_mesData, _unitCount, _mesData.ManufacturingOrder.Name?.Value);
+                    _mesUnitCounter.UpdateCounter(1);
+                    MesUnitCounter.Save(_mesUnitCounter);
+
+                    ThreadHelper.ControlSetText(Tb_LaserQty, _mesUnitCounter.Counter.ToString());
                 }
                 return resultMoveStd.Result ? "Container success to Start, MoveIn and Moved Std" : $"Container success to Start and MoveIn but failed to Moved Std. {resultMoveStd.Message}";
             }
@@ -554,6 +551,7 @@ namespace LaserPrinting
             Tb_FinishedGoodCounter.Clear();
             kryptonDataGridView1.Rows.Clear();
             bindingSource1.DataSource = null;
+            pbProduct.ImageLocation = "";
         }
 
         private async void SetProductionState(ProductionState currentProductionState)
@@ -842,21 +840,20 @@ namespace LaserPrinting
         private async Task GetFinishedGoodRecord()
         {
             if (_mesData == null) return;
+            if (_mesData.ManufacturingOrder==null)return;
 
-            var data = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString(), _containerList);
-            if (data == null || data.Length != _containerList.Count)
+            var data = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+            if (data == null)
             {
-                data = await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+                var temp = await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+                data = temp.ToList();
             }
 
-            if (data != null)
-            {
-                var list = await Mes.IFinishGoodRecordToFinishedGoodLaser(data);
-                bindingSource1.DataSource = new BindingList<FinishedGoodLaser>(list);
+            var list = await Mes.IFinishGoodRecordToFinishedGoodLaser(data.ToArray());
+            bindingSource1.DataSource = new BindingList<FinishedGoodLaser>(list);
+            kryptonDataGridView2.DataSource = bindingSource1;
+            Tb_FinishedGoodCounter.Text = list.Length.ToString();
 
-                kryptonDataGridView2.DataSource = bindingSource1;
-                Tb_FinishedGoodCounter.Text = list.Length.ToString();
-            }
         }
 
         private void Tb_MfgOrder_KeyDown(object sender, KeyEventArgs e)
@@ -950,5 +947,46 @@ namespace LaserPrinting
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+        }
+        private async Task AsyncClosing()
+        {
+            if (_mesUnitCounter != null)
+            {
+                await _mesUnitCounter.StopPoll();
+            }
+            if (!_allowClose)
+            {
+                using (var ss = new LoginForm24())
+                {
+                    var dlg = ss.ShowDialog(this);
+                    if (dlg == DialogResult.Abort)
+                    {
+                        KryptonMessageBox.Show("Login Failed");
+                        _allowClose = false;
+                        return;
+                    }
+                    if (dlg == DialogResult.Cancel)
+                    {
+                        _allowClose = false;
+                        return;
+                    }
+                }
+            }
+            _allowClose = true;
+            Close();
+        }
+        private async void MainAuto24_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (_allowClose)
+            {
+                e.Cancel = false;
+                return;
+            }
+            e.Cancel = true;
+            await AsyncClosing();
+        }
     }
 }

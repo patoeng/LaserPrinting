@@ -10,5 +10,6 @@ namespace LaserPrinting.Model
         public double TimeOffset { get; set; } = 8f;
         public List<string> ContainerList { get; set; } = new List<string>();
         public bool PreparationFinished { get; set; } = false;
+        public int LocalCounter { get; set; } = 0;
     }
 }

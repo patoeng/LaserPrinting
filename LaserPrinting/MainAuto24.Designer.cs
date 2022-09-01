@@ -36,6 +36,7 @@ namespace LaserPrinting
             this.kryptonPanel4 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonPanel10 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
+            this.button1 = new System.Windows.Forms.Button();
             this.lblResMaintMesg = new System.Windows.Forms.Label();
             this.lbTitle = new System.Windows.Forms.Label();
             this.MyTitle = new System.Windows.Forms.Label();
@@ -301,6 +302,7 @@ namespace LaserPrinting
             // 
             // kryptonPanel10
             // 
+            this.kryptonPanel10.Controls.Add(this.button1);
             this.kryptonPanel10.Controls.Add(this.lblResMaintMesg);
             this.kryptonPanel10.Controls.Add(this.lbTitle);
             this.kryptonPanel10.Controls.Add(this.MyTitle);
@@ -311,6 +313,17 @@ namespace LaserPrinting
             this.kryptonPanel10.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(252)))), ((int)(((byte)(252)))));
             this.kryptonPanel10.StateCommon.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(252)))), ((int)(((byte)(252)))));
             this.kryptonPanel10.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(733, 36);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 59;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // lblResMaintMesg
             // 
@@ -568,7 +581,7 @@ namespace LaserPrinting
             this.kryptonPage4});
             this.kryptonNavigator1.Palette = this.TemplateUI;
             this.kryptonNavigator1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.kryptonNavigator1.SelectedIndex = 0;
+            this.kryptonNavigator1.SelectedIndex = 3;
             this.kryptonNavigator1.Size = new System.Drawing.Size(1041, 582);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingInside = new System.Windows.Forms.Padding(0);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingOnly = new System.Windows.Forms.Padding(0);
@@ -2470,6 +2483,7 @@ namespace LaserPrinting
             this.StateInactive.Back.Color1 = System.Drawing.Color.White;
             this.StateInactive.Back.Color2 = System.Drawing.Color.White;
             this.Text = "MainAuto24";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainAuto24_FormClosing);
             this.Load += new System.EventHandler(this.MainAuto24_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).EndInit();
@@ -2679,5 +2693,6 @@ namespace LaserPrinting
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.PictureBox Logo;
         private System.Windows.Forms.Label lblLoadingPo;
+        private System.Windows.Forms.Button button1;
     }
 }
