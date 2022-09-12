@@ -275,6 +275,11 @@ namespace LaserPrinting
                 }
 
                 var inRedis = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+                if (inRedis == null)
+                {
+                    MessageBox.Show(@"Local Cache server error!");
+                    return true;
+                }
                 if (inRedis.Count != mfg.Containers.Length)
                 {
                     await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
@@ -431,7 +436,7 @@ namespace LaserPrinting
                 if (resourceStatus != null)
                 {
                     _mesData.SetResourceStatusDetails(resourceStatus);
-                    if (_mesData.ResourceStatusDetails?.Reason?.Name != "Quality Inspection")
+                    if (_mesData.ResourceStatusDetails?.Reason?.Name != "Quality Inspection" && _mesData.ManufacturingOrder != null)
                     {
                         btnFinishPreparation.Enabled = true;
                         btnStartPreparation.Enabled = false;
@@ -707,44 +712,54 @@ namespace LaserPrinting
 
         private async void btnFinishPreparation_Click(object sender, EventArgs e)
         {
-            if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
+            if (_currentPo != null)
             {
-                KryptonMessageBox.Show("Dummy quantity failed!");
-                return;
-            }
-
-            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance")
-            {
-                KryptonMessageBox.Show("CP under maintenance");
-                return;
-            }
-            if (_mesData.ResourceStatusDetails?.Reason?.Name == "Planned Maintenance")
-            {
-                KryptonMessageBox.Show("CP under maintenance");
-                return;
-            }
-            using (var ss = new LoginForm24("Quality"))
-            {
-                var dlg = ss.ShowDialog(this);
-                if (dlg == DialogResult.Abort)
+                if (_currentPo.ContainerList.Count < _currentPo.DummyQty)
                 {
-                    KryptonMessageBox.Show("Login Failed");
-                   return;
-                }
-                if (dlg == DialogResult.Cancel)
-                {
+                    KryptonMessageBox.Show("Dummy quantity failed!");
                     return;
                 }
-                if (ss.UserDetails.UserRole != UserRole.Quality)return;
 
+                if (_mesData.ResourceStatusDetails?.Reason?.Name == "Maintenance")
+                {
+                    KryptonMessageBox.Show("CP under maintenance");
+                    return;
+                }
+
+                if (_mesData.ResourceStatusDetails?.Reason?.Name == "Planned Maintenance")
+                {
+                    KryptonMessageBox.Show("CP under maintenance");
+                    return;
+                }
+
+                using (var ss = new LoginForm24("Quality"))
+                {
+                    var dlg = ss.ShowDialog(this);
+                    if (dlg == DialogResult.Abort)
+                    {
+                        KryptonMessageBox.Show("Login Failed");
+                        return;
+                    }
+
+                    if (dlg == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+
+                    if (ss.UserDetails.UserRole != UserRole.Quality) return;
+                }
+
+                _currentPo.PreparationFinished = true;
+                _currentPo.Save(_dataLocalPo);
+
+                await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Pass");
+                await GetStatusOfResource();
+                SetProductionState(ProductionState.PreparationFinished);
+                return;
             }
-
-            _currentPo.PreparationFinished = true;
-            _currentPo.Save(_dataLocalPo);
-
             await Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Pass");
             await GetStatusOfResource();
-            SetProductionState(ProductionState.PreparationFinished);
+            SetProductionState(ProductionState.Idle);
         }
 
        
@@ -987,6 +1002,11 @@ namespace LaserPrinting
             }
             e.Cancel = true;
             await AsyncClosing();
+        }
+
+        private void kryptonPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
