@@ -27,6 +27,7 @@ namespace LaserPrinting.Services
         private string _fileName;
         private int _counter;
         private bool _delayActive;
+        private bool _waitingBusy;
 
         public void InitFileWatcher(string fileLocation, string filePattern)
         {
@@ -54,17 +55,24 @@ namespace LaserPrinting.Services
         {
             if (_delayActive)
             {
+               
                 _counter++;
                 if (_counter > 6)
                 {
                     _delayActive = false;
-                    await FileWatcherOnChangedDelayed();
+                    var task  = FileWatcherOnChangedDelayed();
+                    await task;
                 }
             }
         }
 
         private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
         {
+            if (Busy)
+            {
+                _waitingBusy = true;
+                return;
+            }
             _fileName = e.FullPath;
             _counter = 0;
             _delayActive = true;
@@ -77,6 +85,11 @@ namespace LaserPrinting.Services
             if (FileChangedDetected != null)
             {
                 var s =await Task.Run(()=> FileChangedDetected?.Invoke(_fileName)) ;
+                if (_waitingBusy)
+                {
+                   s = await Task.Run(() => FileChangedDetected?.Invoke(_fileName));
+                   _waitingBusy = false;
+                }
             }
             Busy = false;
         }

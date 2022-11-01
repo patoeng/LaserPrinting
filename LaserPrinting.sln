@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MesData", "..\MesData\MesDa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PopUpMessage", "PopUpMessage\PopUpMessage.csproj", "{B76A9D91-DC94-4A5E-B1EC-4037FE481761}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmulatePreTrialLaser", "EmulatePreTrialLaser\EmulatePreTrialLaser.csproj", "{EBA1F883-E3F2-4C98-93DC-1C066D7364CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B76A9D91-DC94-4A5E-B1EC-4037FE481761}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B76A9D91-DC94-4A5E-B1EC-4037FE481761}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B76A9D91-DC94-4A5E-B1EC-4037FE481761}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBA1F883-E3F2-4C98-93DC-1C066D7364CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBA1F883-E3F2-4C98-93DC-1C066D7364CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBA1F883-E3F2-4C98-93DC-1C066D7364CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBA1F883-E3F2-4C98-93DC-1C066D7364CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

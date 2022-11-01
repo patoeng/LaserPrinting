@@ -159,14 +159,20 @@ namespace LaserPrinting
             this.kryptonPanel9 = new ComponentFactory.Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnSynchronized = new ComponentFactory.Krypton.Toolkit.KryptonButton();
             this.lblLoading = new System.Windows.Forms.Label();
             this.lblPo = new System.Windows.Forms.Label();
             this.kryptonDataGridView2 = new ComponentFactory.Krypton.Toolkit.KryptonDataGridView();
+            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.laserMoveOutDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.serialNumberDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.controlPointDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.panel3 = new System.Windows.Forms.Panel();
             this.label28 = new System.Windows.Forms.Label();
             this.Tb_FinishedGoodCounter = new ComponentFactory.Krypton.Toolkit.KryptonTextBox();
             this.TimerRealtime = new System.Windows.Forms.Timer(this.components);
-            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.tmrFirstLoad = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).BeginInit();
             this.kryptonPanel4.SuspendLayout();
@@ -221,8 +227,8 @@ namespace LaserPrinting
             this.tableLayoutPanel8.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView2)).BeginInit();
-            this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // TemplateUI
@@ -429,6 +435,7 @@ namespace LaserPrinting
             this.pbProduct.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbProduct.TabIndex = 1;
             this.pbProduct.TabStop = false;
+            this.pbProduct.Click += new System.EventHandler(this.pbProduct_Click);
             // 
             // kryptonPanel2
             // 
@@ -493,7 +500,7 @@ namespace LaserPrinting
             this.Tb_TimeAtStatus.Enabled = false;
             this.Tb_TimeAtStatus.Location = new System.Drawing.Point(13, 81);
             this.Tb_TimeAtStatus.Name = "Tb_TimeAtStatus";
-            this.Tb_TimeAtStatus.Size = new System.Drawing.Size(173, 27);
+            this.Tb_TimeAtStatus.Size = new System.Drawing.Size(173, 26);
             this.Tb_TimeAtStatus.StateCommon.Back.Color1 = System.Drawing.Color.White;
             this.Tb_TimeAtStatus.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.Tb_TimeAtStatus.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
@@ -507,7 +514,6 @@ namespace LaserPrinting
             this.Tb_TimeAtStatus.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.Tb_TimeAtStatus.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1);
             this.Tb_TimeAtStatus.TabIndex = 115;
-            this.Tb_TimeAtStatus.Text = "0.001232";
             this.Tb_TimeAtStatus.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label19
@@ -539,7 +545,7 @@ namespace LaserPrinting
             this.Tb_StatusCode.Enabled = false;
             this.Tb_StatusCode.Location = new System.Drawing.Point(13, 28);
             this.Tb_StatusCode.Name = "Tb_StatusCode";
-            this.Tb_StatusCode.Size = new System.Drawing.Size(173, 27);
+            this.Tb_StatusCode.Size = new System.Drawing.Size(173, 26);
             this.Tb_StatusCode.StateCommon.Back.Color1 = System.Drawing.Color.White;
             this.Tb_StatusCode.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.Tb_StatusCode.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
@@ -553,7 +559,6 @@ namespace LaserPrinting
             this.Tb_StatusCode.StateCommon.Content.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
             this.Tb_StatusCode.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1);
             this.Tb_StatusCode.TabIndex = 113;
-            this.Tb_StatusCode.Text = "Setting";
             this.Tb_StatusCode.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tableLayoutPanel4
@@ -582,7 +587,7 @@ namespace LaserPrinting
             this.kryptonPage4});
             this.kryptonNavigator1.Palette = this.TemplateUI;
             this.kryptonNavigator1.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.Custom;
-            this.kryptonNavigator1.SelectedIndex = 0;
+            this.kryptonNavigator1.SelectedIndex = 3;
             this.kryptonNavigator1.Size = new System.Drawing.Size(1041, 582);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingInside = new System.Windows.Forms.Padding(0);
             this.kryptonNavigator1.StateCommon.Bar.BarPaddingOnly = new System.Windows.Forms.Padding(0);
@@ -2367,6 +2372,7 @@ namespace LaserPrinting
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.btnSynchronized);
             this.panel2.Controls.Add(this.lblLoading);
             this.panel2.Controls.Add(this.lblPo);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -2374,6 +2380,72 @@ namespace LaserPrinting
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1033, 56);
             this.panel2.TabIndex = 0;
+            // 
+            // btnSynchronized
+            // 
+            this.btnSynchronized.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSynchronized.Location = new System.Drawing.Point(796, 4);
+            this.btnSynchronized.Name = "btnSynchronized";
+            this.btnSynchronized.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.OverrideDefault.Back.ColorAngle = 45F;
+            this.btnSynchronized.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.OverrideDefault.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.OverrideDefault.Border.ColorAngle = 45F;
+            this.btnSynchronized.OverrideDefault.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnSynchronized.OverrideDefault.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.btnSynchronized.OverrideDefault.Border.Rounding = 30;
+            this.btnSynchronized.OverrideDefault.Border.Width = 1;
+            this.btnSynchronized.PaletteMode = ComponentFactory.Krypton.Toolkit.PaletteMode.ProfessionalSystem;
+            this.btnSynchronized.Size = new System.Drawing.Size(209, 48);
+            this.btnSynchronized.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.StateCommon.Back.ColorAngle = 45F;
+            this.btnSynchronized.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(147)))), ((int)(((byte)(60)))));
+            this.btnSynchronized.StateCommon.Border.ColorAngle = 45F;
+            this.btnSynchronized.StateCommon.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnSynchronized.StateCommon.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.btnSynchronized.StateCommon.Border.Rounding = 30;
+            this.btnSynchronized.StateCommon.Border.Width = 1;
+            this.btnSynchronized.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnSynchronized.StateCommon.Content.ShortText.Color2 = System.Drawing.Color.White;
+            this.btnSynchronized.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSynchronized.StateDisabled.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnSynchronized.StateDisabled.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnSynchronized.StateDisabled.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnSynchronized.StateDisabled.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnSynchronized.StateDisabled.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnSynchronized.StatePressed.Back.Color1 = System.Drawing.Color.Lime;
+            this.btnSynchronized.StatePressed.Back.Color2 = System.Drawing.Color.Lime;
+            this.btnSynchronized.StatePressed.Back.ColorAngle = 135F;
+            this.btnSynchronized.StatePressed.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSynchronized.StatePressed.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSynchronized.StatePressed.Border.ColorAngle = 135F;
+            this.btnSynchronized.StatePressed.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnSynchronized.StatePressed.Border.Rounding = 30;
+            this.btnSynchronized.StatePressed.Border.Width = 1;
+            this.btnSynchronized.StateTracking.Back.Color1 = System.Drawing.Color.Lime;
+            this.btnSynchronized.StateTracking.Back.Color2 = System.Drawing.Color.Lime;
+            this.btnSynchronized.StateTracking.Back.ColorAngle = 45F;
+            this.btnSynchronized.StateTracking.Border.ColorAngle = 45F;
+            this.btnSynchronized.StateTracking.Border.DrawBorders = ((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders)((((ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Top | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | ComponentFactory.Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnSynchronized.StateTracking.Border.GraphicsHint = ComponentFactory.Krypton.Toolkit.PaletteGraphicsHint.AntiAlias;
+            this.btnSynchronized.StateTracking.Border.Rounding = 30;
+            this.btnSynchronized.StateTracking.Border.Width = 1;
+            this.btnSynchronized.TabIndex = 112;
+            this.btnSynchronized.Values.Text = "Synchronize";
+            this.btnSynchronized.Click += new System.EventHandler(this.btnSynchronized_Click);
             // 
             // lblLoading
             // 
@@ -2403,15 +2475,56 @@ namespace LaserPrinting
             // 
             this.kryptonDataGridView2.AllowUserToAddRows = false;
             this.kryptonDataGridView2.AllowUserToDeleteRows = false;
-            this.kryptonDataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.kryptonDataGridView2.AutoGenerateColumns = false;
             this.kryptonDataGridView2.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.kryptonDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.kryptonDataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.idDataGridViewTextBoxColumn,
+            this.laserMoveOutDataGridViewTextBoxColumn,
+            this.serialNumberDataGridViewTextBoxColumn,
+            this.controlPointDataGridViewTextBoxColumn});
+            this.kryptonDataGridView2.DataSource = this.bindingSource1;
             this.kryptonDataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonDataGridView2.Location = new System.Drawing.Point(3, 65);
             this.kryptonDataGridView2.Name = "kryptonDataGridView2";
-            this.kryptonDataGridView2.ReadOnly = true;
             this.kryptonDataGridView2.Size = new System.Drawing.Size(1033, 425);
             this.kryptonDataGridView2.TabIndex = 0;
+            this.kryptonDataGridView2.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.kryptonDataGridView2_ColumnHeaderMouseClick);
+            // 
+            // idDataGridViewTextBoxColumn
+            // 
+            this.idDataGridViewTextBoxColumn.DataPropertyName = "Id";
+            this.idDataGridViewTextBoxColumn.HeaderText = "Id";
+            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
+            this.idDataGridViewTextBoxColumn.ReadOnly = true;
+            this.idDataGridViewTextBoxColumn.Width = 46;
+            // 
+            // laserMoveOutDataGridViewTextBoxColumn
+            // 
+            this.laserMoveOutDataGridViewTextBoxColumn.DataPropertyName = "LaserMoveOut";
+            this.laserMoveOutDataGridViewTextBoxColumn.HeaderText = "LaserMoveOut";
+            this.laserMoveOutDataGridViewTextBoxColumn.Name = "laserMoveOutDataGridViewTextBoxColumn";
+            this.laserMoveOutDataGridViewTextBoxColumn.ReadOnly = true;
+            this.laserMoveOutDataGridViewTextBoxColumn.Width = 113;
+            // 
+            // serialNumberDataGridViewTextBoxColumn
+            // 
+            this.serialNumberDataGridViewTextBoxColumn.DataPropertyName = "SerialNumber";
+            this.serialNumberDataGridViewTextBoxColumn.HeaderText = "SerialNumber";
+            this.serialNumberDataGridViewTextBoxColumn.Name = "serialNumberDataGridViewTextBoxColumn";
+            this.serialNumberDataGridViewTextBoxColumn.ReadOnly = true;
+            this.serialNumberDataGridViewTextBoxColumn.Width = 250;
+            // 
+            // controlPointDataGridViewTextBoxColumn
+            // 
+            this.controlPointDataGridViewTextBoxColumn.DataPropertyName = "ControlPoint";
+            this.controlPointDataGridViewTextBoxColumn.HeaderText = "Control Point";
+            this.controlPointDataGridViewTextBoxColumn.Name = "controlPointDataGridViewTextBoxColumn";
+            this.controlPointDataGridViewTextBoxColumn.Width = 250;
+            // 
+            // bindingSource1
+            // 
+            this.bindingSource1.DataSource = typeof(MesData.FinishedGoodLaser);
             // 
             // panel3
             // 
@@ -2462,9 +2575,9 @@ namespace LaserPrinting
             this.TimerRealtime.Interval = 5000;
             this.TimerRealtime.Tick += new System.EventHandler(this.TimerRealtime_Tick);
             // 
-            // bindingSource1
+            // tmrFirstLoad
             // 
-            this.bindingSource1.DataSource = typeof(MesData.FinishedGood);
+            this.tmrFirstLoad.Tick += new System.EventHandler(this.tmrFirstLoad_Tick);
             // 
             // MainAuto24
             // 
@@ -2550,9 +2663,9 @@ namespace LaserPrinting
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonDataGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2695,5 +2808,11 @@ namespace LaserPrinting
         private System.Windows.Forms.PictureBox Logo;
         private System.Windows.Forms.Label lblLoadingPo;
         private System.Windows.Forms.Button button1;
+        private ComponentFactory.Krypton.Toolkit.KryptonButton btnSynchronized;
+        private System.Windows.Forms.Timer tmrFirstLoad;
+        private System.Windows.Forms.DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn laserMoveOutDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn serialNumberDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn controlPointDataGridViewTextBoxColumn;
     }
 }

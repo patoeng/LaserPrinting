@@ -121,7 +121,8 @@ namespace LaserPrinting
             }
             foreach(var sn in list)
             {
-                var s = await StartMoveInMove(sn);
+                var task = StartMoveInMove(sn);
+                var s = await task;
                 ThreadHelper.ControlAppendFirstText(Tb_Message,$"{DateTime.Now:s} :[{sn.Barcode}] ---> {s}");
             }
             ThreadHelper.ControlAppendFirstText(Tb_Message, $"{DateTime.Now:s} :Parsing ---> {fileLocation}... Done");
@@ -234,11 +235,11 @@ namespace LaserPrinting
 
                 var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
-                if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                if (!resultMoveIn)
                 {
                     transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                     resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
-                    if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                    if (!resultMoveIn)
                     {
                         transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, product.PrintedDateTime);
                         resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
@@ -251,10 +252,10 @@ namespace LaserPrinting
 
                 
                 var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
-                if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                if (!resultMoveStd.Result )
                 {
                     resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
-                    if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                    if (!resultMoveStd.Result)
                     {
                         resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, DateTime.Now, cDataPoint);
                     }

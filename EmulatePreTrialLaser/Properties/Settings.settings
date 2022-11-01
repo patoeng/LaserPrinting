@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EmulatePreTrialLaser.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Prefix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">22016B50M</Value>
+    </Setting>
+    <Setting Name="FilePrefix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">gHL</Value>
+    </Setting>
+    <Setting Name="Sufix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">1820N</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -19,7 +19,7 @@ using MesData.Login;
 using MesData.UnitCounter;
 using OpcenterWikLibrary;
 using PopUpMessage;
-using Environment = System.Environment;
+using System.Linq.Dynamic;
 
 namespace LaserPrinting
 {
@@ -33,6 +33,8 @@ namespace LaserPrinting
         private int _indexMaintenanceState;
         private MesUnitCounter _mesUnitCounter;
         private bool _allowClose;
+        private bool _sortAscending;
+        private BindingList<FinishedGoodLaser> _bindingList;
 
         public MainAuto24()
         {
@@ -42,6 +44,7 @@ namespace LaserPrinting
             InitFileWatcher();
             ClearTextBox();
             SetProductionState(ProductionState.Idle);
+            tmrFirstLoad.Start();
         }
         public void InitLaserPrinting()
         {
@@ -135,7 +138,7 @@ namespace LaserPrinting
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            if (_mesData.ResourceStatusDetails == null || _mesData.ResourceStatusDetails?.Availability != "Up")
+            if (_mesData.ResourceStatusDetails == null || (_mesData.ResourceStatusDetails?.Availability != "Up" && _mesData.ResourceStatusDetails?.ReasonCodeName?.Value!="Maintenance"))
             {
                 EventLogUtil.LogEvent("Resource status is not in UP condition!", EventLogEntryType.Warning);
                 KryptonMessageBox.Show($"Resource status is not in UP condition!", "File Watcher",
@@ -171,6 +174,8 @@ namespace LaserPrinting
             {
                 return false;
             }
+
+            if (_mesData.ResourceStatusDetails?.ReasonCodeName?.Value == "Maintenance") return true;
             foreach (var sn in list)
             {
                 if (sn.ArticleNumber != _mesData.ManufacturingOrder.Product.Name)
@@ -179,7 +184,8 @@ namespace LaserPrinting
                     return false;
                 }
                 PopUpMessageHelper.CloseAll();
-                var s = await StartMoveInMove(sn);
+                var task =  StartMoveInMove(sn);
+                var s = await task;
 
             }
             return true;
@@ -257,11 +263,9 @@ namespace LaserPrinting
                 }
                 _mesUnitCounter = MesUnitCounter.Load(MesUnitCounter.GetFileName(mfg.Name.Value));
 
-                if (!MesUnitCounter.FileExist(mfg.Name.ToString()))
-                {
-                    var cnt = await Mes.GetCounterFromMfgOrder(_mesData,120000);
-                   _mesUnitCounter.SetActiveMfgOrder(mfg.Name.Value,cnt);
-                }
+             
+                _mesUnitCounter.SetActiveMfgOrder(mfg.Name.Value);
+              
                 _mesUnitCounter.InitPoll(_mesData);
                 _mesUnitCounter.StartPoll();
                 MesUnitCounter.Save(_mesUnitCounter);
@@ -278,6 +282,11 @@ namespace LaserPrinting
                 if (inRedis == null)
                 {
                     MessageBox.Show(@"Local Cache server error!");
+                    return true;
+                }
+
+                if (mfg.Containers == null)
+                {
                     return true;
                 }
                 if (inRedis.Count != mfg.Containers.Length)
@@ -325,11 +334,11 @@ namespace LaserPrinting
               
                 var transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
-                if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                if (!resultMoveIn)
                 {
                     transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                     resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
-                    if (!resultMoveIn && transaction.Message.Contains("TimeOut"))
+                    if (!resultMoveIn)
                     {
                         transaction = await Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                         resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
@@ -345,10 +354,10 @@ namespace LaserPrinting
                 var cDataPoint = product.LaserMarkingData.ToDataPointDetailsList().ToArray();
 
                 var resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
-                if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                if (!resultMoveStd.Result)
                 {
                     resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
-                    if (!resultMoveStd.Result && resultMoveStd.Message.Contains("TimeOut"))
+                    if (!resultMoveStd.Result)
                     {
                         resultMoveStd = await Mes.ExecuteMoveStandard(_mesData, product.Barcode, dMoveOut, cDataPoint);
                     }
@@ -379,7 +388,7 @@ namespace LaserPrinting
                     oContainerStatus = await Mes.GetCurrentContainerStep(_mesData, product.Barcode);
                     await Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
 
-                    _mesUnitCounter.UpdateCounter(1);
+                    _mesUnitCounter.UpdateCounter(product.Barcode);
                     MesUnitCounter.Save(_mesUnitCounter);
 
                     ThreadHelper.ControlSetText(Tb_LaserQty, _mesUnitCounter.Counter.ToString());
@@ -629,12 +638,8 @@ namespace LaserPrinting
 
         }
 
-        private async void MainAuto24_Load(object sender, EventArgs e)
+        private  void MainAuto24_Load(object sender, EventArgs e)
         {
-            await GetStatusOfResource();
-            await GetResourceStatusCodeList();
-            await GetStatusMaintenanceDetails();
-          
         }
 
         private async void btnStartPreparation_Click(object sender, EventArgs e)
@@ -771,6 +776,12 @@ namespace LaserPrinting
 
         private async void btnCallMaintenance_Click(object sender, EventArgs e)
         {
+            var dlg = MessageBox.Show(@"Are you sure want to call maintenance?", @"Call Maintenance",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dlg == DialogResult.No)
+            {
+                return;
+            }
             await Mes.SetResourceStatus(_mesData, "LS - Internal Downtime", "Maintenance");
             await GetStatusOfResource();
         }
@@ -865,7 +876,8 @@ namespace LaserPrinting
             }
 
             var list = await Mes.IFinishGoodRecordToFinishedGoodLaser(data.ToArray());
-            bindingSource1.DataSource = new BindingList<FinishedGoodLaser>(list);
+            _bindingList = new BindingList<FinishedGoodLaser>(list);
+            bindingSource1.DataSource = _bindingList;
             kryptonDataGridView2.DataSource = bindingSource1;
             Tb_FinishedGoodCounter.Text = list.Length.ToString();
 
@@ -1007,6 +1019,44 @@ namespace LaserPrinting
         private void kryptonPanel1_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private async void btnSynchronized_Click(object sender, EventArgs e)
+        {
+            if (_mesData == null) return;
+            if (_mesData.ManufacturingOrder == null) return;
+            lblLoading.Visible = true;
+           
+            var temp = await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+
+            var data = await Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
+
+            var list = await Mes.IFinishGoodRecordToFinishedGoodLaser(data.ToArray());
+            _bindingList = new BindingList<FinishedGoodLaser>(list);
+            bindingSource1.DataSource = _bindingList;
+            kryptonDataGridView2.DataSource = bindingSource1;
+            Tb_FinishedGoodCounter.Text = list.Length.ToString();
+            lblLoading.Visible = false;
+        }
+
+        private async void tmrFirstLoad_Tick(object sender, EventArgs e)
+        {
+            tmrFirstLoad.Stop();
+            await GetStatusOfResource();
+            await GetResourceStatusCodeList();
+            await GetStatusMaintenanceDetails();
+        }
+
+        private void pbProduct_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void kryptonDataGridView2_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (_bindingList == null) return;
+            kryptonDataGridView2.DataSource = _sortAscending ? _bindingList.OrderBy(kryptonDataGridView2.Columns[e.ColumnIndex].DataPropertyName).ToList() : _bindingList.OrderBy(kryptonDataGridView2.Columns[e.ColumnIndex].DataPropertyName).Reverse().ToList();
+            _sortAscending = !_sortAscending;
         }
     }
 }
