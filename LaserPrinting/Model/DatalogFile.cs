@@ -61,12 +61,12 @@ namespace LaserPrinting.Model
             }
             return data;
         }
-        public static async Task<TransactionResult> SaveDatalogFileHistory( DatalogFile datalogFile, string databaseFile=DbFileName)
+        public static TransactionResult SaveDatalogFileHistory( DatalogFile datalogFile, string databaseFile=DbFileName)
         {
             //Check if database file exist, try create if not exist.
             if (!File.Exists(databaseFile))
             {
-                var rslt = await CreateDatabaseFile(databaseFile);
+                var rslt =  CreateDatabaseFile(databaseFile);
                 if (!rslt.Result) return rslt;
             }
             try
@@ -76,16 +76,16 @@ namespace LaserPrinting.Model
 
 
                 
-                var dataExist = await GetDatalogFileById( datalogFile.Id, databaseFile);
+                var dataExist =  GetDatalogFileById( datalogFile.Id, databaseFile);
                 var commandText = "";
 
                 commandText= dataExist.Data == null ? "INSERT INTO DatalogFiles (Id,FileName,LastRowIndex,LastMarkCount) VALUES (@id,@fileName,@lastRowIndex,@lastMarkCount)" : "UPDATE DatalogFiles SET FileName=@fileName, LastRowIndex=@lastRowIndex,LastMarkCount=@lastMarkCount WHERE id=@id";
                 var cmd = new FbCommand(commandText,con);
                 var cmdParam = DatalogFileToCmdParameter(datalogFile);
                 cmd.Parameters.AddRange(cmdParam);
-                await cmd.PrepareAsync();
-                var result = await cmd.ExecuteNonQueryAsync() ;
-                await con.CloseAsync();
+                 cmd.Prepare();
+                var result = cmd.ExecuteNonQuery() ;
+                con.Close();
                 return TransactionResult.Create(true,result);
             }
             catch (FbException exception)
@@ -98,20 +98,20 @@ namespace LaserPrinting.Model
             }
 
         }
-        public static async Task<TransactionResult> CreateDatabaseFile(string databaseFile)
+        public static TransactionResult CreateDatabaseFile(string databaseFile)
         {
             //Check if database file exist, try create if not exist.
             if (File.Exists(databaseFile)) return TransactionResult.Create(true);
             try
             {
-                await FbConnection.CreateDatabaseAsync(Database);
+                FbConnection.CreateDatabase(Database);
 
                 var con = new FbConnection(Database);
                 con.Open();
                 
                 var cmd = new FbCommand(@"CREATE TABLE DATALOGFILES(ID VARCHAR(38)  PRIMARY KEY, FileName VARCHAR(300), LastRowIndex INTEGER, LastMarkCount INTEGER)", con);
-                var result = await cmd.ExecuteNonQueryAsync();
-                await con.CloseAsync();
+                var result = cmd.ExecuteNonQuery(); 
+                con.Close();
                 return TransactionResult.Create(true, result);
             }
             catch (FbException exception)
@@ -136,7 +136,7 @@ namespace LaserPrinting.Model
             return list;
         }
 
-        public static async Task<TransactionResult> GetDatalogFileByFileName(string datalogFileName, string databaseFile = DbFileName)
+        public static TransactionResult GetDatalogFileByFileName(string datalogFileName, string databaseFile = DbFileName)
         {
             var df = new DatalogFile
             {
@@ -155,9 +155,9 @@ namespace LaserPrinting.Model
                 var cmd = new FbCommand("SELECT * FROM DatalogFiles Where FileName=@fileName", con);
                 var cmdParam = DatalogFileToCmdParameter(df);
                 cmd.Parameters.AddRange(cmdParam);
-                await cmd.PrepareAsync();
+                cmd.Prepare();
 
-                var rdr = await cmd.ExecuteReaderAsync();
+                var rdr = cmd.ExecuteReader();
                 if (rdr.HasRows)
                 {
                     if(rdr.Read())
@@ -168,7 +168,7 @@ namespace LaserPrinting.Model
                         df.LastMarkCount = rdr.GetInt32(3);
                     }
                 }
-                await con.CloseAsync();
+                con.Close();
                 return TransactionResult.Create(true, df);
             }
             catch (FbException exception)
@@ -180,7 +180,7 @@ namespace LaserPrinting.Model
                 return TransactionResult.Create(false, exception, -1, exception.Message);
             }
         }
-        public static async Task<TransactionResult> GetDatalogFileById(Guid identity, string databaseFile = DbFileName)
+        public static TransactionResult GetDatalogFileById(Guid identity, string databaseFile = DbFileName)
         {
            
             DatalogFile df = new DatalogFile
@@ -200,9 +200,9 @@ namespace LaserPrinting.Model
                 var cmd = new FbCommand("SELECT * FROM DatalogFiles Where DatalogFiles.Id=@id", con);
                 var cmdParam = DatalogFileToCmdParameter(df);
                 cmd.Parameters.AddRange(cmdParam);
-                await cmd.PrepareAsync();
+                cmd.Prepare();
 
-                var rdr = await cmd.ExecuteReaderAsync();
+                var rdr = cmd.ExecuteReader();
                 if (rdr.HasRows)
                 {
                     if (rdr.Read())
@@ -211,11 +211,11 @@ namespace LaserPrinting.Model
                         df.FileName = rdr.GetString(1);
                         df.LastRowIndex = rdr.GetInt32(2);
                         df.LastMarkCount = rdr.GetInt32(3);
-                        await con.CloseAsync();
+                        con.Close();
                         return TransactionResult.Create(true, df);
                     }
                 }
-                await con.CloseAsync();
+                con.Close();
                 return TransactionResult.Create(true);
             }
             catch (FbException exception)

@@ -7,7 +7,7 @@ namespace LaserPrinting.Services
 {
     public class DatalogFileWatcher
     {
-        public delegate Task<bool> FileChangedMethod(string filename);
+        public delegate bool FileChangedMethod(string filename);
 
         public event FileChangedMethod FileChangedDetected;
 
@@ -51,7 +51,7 @@ namespace LaserPrinting.Services
         
     }
 
-        private async void TimerDelayFileChangedTicked(object sender, EventArgs e)
+        private  void TimerDelayFileChangedTicked(object sender, EventArgs e)
         {
             if (_delayActive)
             {
@@ -60,8 +60,7 @@ namespace LaserPrinting.Services
                 if (_counter > 6)
                 {
                     _delayActive = false;
-                    var task  = FileWatcherOnChangedDelayed();
-                    await task;
+                    FileWatcherOnChangedDelayed();
                 }
             }
         }
@@ -78,16 +77,16 @@ namespace LaserPrinting.Services
             _delayActive = true;
         }
 
-        private async Task FileWatcherOnChangedDelayed()
+        private void FileWatcherOnChangedDelayed()
         {
             if (Busy) return;
             Busy = true;
             if (FileChangedDetected != null)
             {
-                var s =await Task.Run(()=> FileChangedDetected?.Invoke(_fileName)) ;
+                var s =FileChangedDetected?.Invoke(_fileName) ;
                 if (_waitingBusy)
                 {
-                   s = await Task.Run(() => FileChangedDetected?.Invoke(_fileName));
+                   s = FileChangedDetected?.Invoke(_fileName);
                    _waitingBusy = false;
                 }
             }
