@@ -177,7 +177,7 @@ namespace EmulatePreTrialLaser
             // 
             this.nmIndex.Location = new System.Drawing.Point(131, 65);
             this.nmIndex.Maximum = new decimal(new int[] {
-            1000,
+            9999,
             0,
             0,
             0});

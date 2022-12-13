@@ -37,8 +37,7 @@ namespace LaserPrinting
         private bool _sortAscending;
         private BindingList<FinishedGoodLaser> _bindingList;
         private BackgroundWorker _syncWorker;
-        private AbortableBackgroundWorker _getContainerStatusWorker;
-        private BackgroundWorker _moveWorker;
+        private AbortableBackgroundWorker _moveWorker;
 
         public MainAuto24()
         {
@@ -115,7 +114,7 @@ namespace LaserPrinting
             //_getContainerStatusWorker.ProgressChanged += GetContainerProgress;
             //_getContainerStatusWorker.DoWork += GetContainerDoWork();
 
-            _moveWorker = new BackgroundWorker();
+            _moveWorker = new AbortableBackgroundWorker();
             _moveWorker.WorkerReportsProgress = true;
             _moveWorker.RunWorkerCompleted += MoveWorkerCompleted;
             _moveWorker.ProgressChanged += MoveWorkerProgress;
@@ -125,7 +124,19 @@ namespace LaserPrinting
 
         private void MoveWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            
+            var list = (List<LaserPrintingProduct>) e.Argument;
+            foreach (var sn in list)
+            {
+                if (sn.ArticleNumber != _mesData.ManufacturingOrder.Product.Name)
+                {
+                    PopUpMessageHelper.Show();
+                    _moveWorker.CancelAsync();
+                }
+                PopUpMessageHelper.CloseAll();
+                var task = StartMoveInMove(sn);
+                _moveWorker.ReportProgress(1,task);
+
+            }
         }
 
 
@@ -167,6 +178,8 @@ namespace LaserPrinting
      
         private   bool DatalogParserMethod(string fileLocation)
         {
+            if (_moveWorker.IsBusy) return false;
+
             var fileNewPath = fileLocation.Replace('\\', '/');
            // ThreadHelper.ControlSetText(Tb_Message, "");
             if (_mesData.ManufacturingOrder == null)
@@ -214,18 +227,8 @@ namespace LaserPrinting
             }
 
             if (_mesData.ResourceStatusDetails?.ReasonCodeName?.Value == "Maintenance") return true;
-            foreach (var sn in list)
-            {
-                if (sn.ArticleNumber != _mesData.ManufacturingOrder.Product.Name)
-                {
-                    PopUpMessageHelper.Show();
-                    return false;
-                }
-                PopUpMessageHelper.CloseAll();
-                var task =  StartMoveInMove(sn);
-                var s =   task;
 
-            }
+            _moveWorker.RunWorkerAsync(list);
             return true;
         }
 
@@ -351,10 +354,10 @@ namespace LaserPrinting
                 if (product.PrintedDateTime < _mesData.ProductionDateStart) return "Container date is older than production date!";
                 if (product.PrintedDateTime > DateTime.Now) return "Container date is in the future!";
 
-                var dMoveIn = product.PrintedDateTime.AddHours(_currentPo.TimeOffset);
+               
                 ThreadHelper.ControlSetText(Tb_ArticleNumber,product.ArticleNumber);
                 ThreadHelper.ControlSetText(Tb_SerialNumber, product.Barcode);
-                ThreadHelper.ControlSetText(lbMoveIn, dMoveIn.ToString(Mes.DateTimeStringFormat));
+               
                 ThreadHelper.ControlSetText(lbMoveOut, "");
 
                 var resultStart =   Mes.ExecuteStart(_mesData, product.Barcode, (string)_mesData.ManufacturingOrder.Name, _mesData.ManufacturingOrder.Product.Name,_mesData.WorkFlow, Tb_MfgQty.Text);
@@ -385,16 +388,18 @@ namespace LaserPrinting
 
                 var oContainerStatus =   Mes.GetCurrentContainerStep(_mesData, product.Barcode);
                   Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
-              
-                var transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, DateTime.Now);
+                var dMoveIn = DateTime.Now;// product.PrintedDateTime.AddHours(_currentPo.TimeOffset);
+                var transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                 if (!resultMoveIn)
                 {
-                    transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, DateTime.Now);
+                    dMoveIn = DateTime.Now;
+                    transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                     resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     if (!resultMoveIn)
                     {
-                        transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, DateTime.Now);
+                        dMoveIn = DateTime.Now;
+                        transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                         resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
                     }
                 }
@@ -403,6 +408,7 @@ namespace LaserPrinting
                 {
                     return $"Container failed Move In. {transaction.Result}";
                 }
+                ThreadHelper.ControlSetText(lbMoveIn, dMoveIn.ToString(Mes.DateTimeStringFormat));
                 //atributes
                 var dMoveOut = DateTime.Now.AddHours(_currentPo.TimeOffset);
                 var cDataPoint = product.LaserMarkingData.ToDataPointDetailsList().ToArray();
