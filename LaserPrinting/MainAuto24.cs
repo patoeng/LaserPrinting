@@ -108,12 +108,6 @@ namespace LaserPrinting
             _syncWorker.ProgressChanged += SyncWorkerProgress;
             _syncWorker.DoWork += SyncDoWork;
 
-            //_getContainerStatusWorker = new AbortableBackgroundWorker();
-            //_getContainerStatusWorker.WorkerReportsProgress =true;
-            //_getContainerStatusWorker.RunWorkerCompleted += GetContainerCompleted;
-            //_getContainerStatusWorker.ProgressChanged += GetContainerProgress;
-            //_getContainerStatusWorker.DoWork += GetContainerDoWork();
-
             _moveWorker = new AbortableBackgroundWorker();
             _moveWorker.WorkerReportsProgress = true;
             _moveWorker.RunWorkerCompleted += MoveWorkerCompleted;
@@ -130,12 +124,13 @@ namespace LaserPrinting
                 if (sn.ArticleNumber != _mesData.ManufacturingOrder.Product.Name)
                 {
                     PopUpMessageHelper.Show();
-                    _moveWorker.CancelAsync();
                 }
-                PopUpMessageHelper.CloseAll();
-                var task = StartMoveInMove(sn);
-                _moveWorker.ReportProgress(1,task);
-
+                else
+                {
+                    PopUpMessageHelper.CloseAll();
+                    var task = StartMoveInMove(sn);
+                    _moveWorker.ReportProgress(1, task);
+                }
             }
         }
 
@@ -925,7 +920,7 @@ namespace LaserPrinting
             }
         }
 
-        private   void kryptonNavigator1_SelectedPageChanged(object sender, EventArgs e)
+        private async   void kryptonNavigator1_SelectedPageChanged(object sender, EventArgs e)
         {
             if (kryptonNavigator1.SelectedIndex == 1)
             {
@@ -936,7 +931,7 @@ namespace LaserPrinting
             {
                 lblPo.Text = $@"Serial Number of PO: {_mesData.ManufacturingOrder?.Name}";
                 lblLoading.Visible = true;
-                GetFinishedGoodRecord();
+                await GetFinishedGoodRecord();
                 if (!_syncWorker.IsBusy)lblLoading.Visible = false;
             }
             if (kryptonNavigator1.SelectedIndex == 2)
