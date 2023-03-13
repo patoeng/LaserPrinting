@@ -382,7 +382,7 @@ namespace LaserPrinting
                 }
 
                 var oContainerStatus =   Mes.GetCurrentContainerStep(_mesData, product.Barcode);
-                  Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
+                Mes.UpdateOrCreateFinishGoodRecordToCached(_mesData, _mesData.ManufacturingOrder.Name?.Value, product.Barcode, oContainerStatus);
                 var dMoveIn = DateTime.Now;// product.PrintedDateTime.AddHours(_currentPo.TimeOffset);
                 var transaction =   Mes.ExecuteMoveIn(_mesData, product.Barcode, dMoveIn);
                 var resultMoveIn = transaction.Result || transaction.Message == "Move-in has already been performed for this operation.";
@@ -845,8 +845,8 @@ namespace LaserPrinting
                 SetProductionState(ProductionState.PreparationFinished);
                 return;
             }
-              Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Pass");
-              GetStatusOfResource();
+            Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Pass");
+            GetStatusOfResource();
             SetProductionState(ProductionState.Idle);
         }
 
@@ -865,8 +865,8 @@ namespace LaserPrinting
             {
                 return;
             }
-              Mes.SetResourceStatus(_mesData, "LS - Internal Downtime", "Maintenance");
-              GetStatusOfResource();
+            Mes.SetResourceStatus(_mesData, "LS - Internal Downtime", "Maintenance");
+            GetStatusOfResource();
         }
 
         private   void Cb_StatusCode_SelectedIndexChanged(object sender, EventArgs e)
@@ -931,7 +931,14 @@ namespace LaserPrinting
             {
                 lblPo.Text = $@"Serial Number of PO: {_mesData.ManufacturingOrder?.Name}";
                 lblLoading.Visible = true;
-                await GetFinishedGoodRecord();
+                try
+                {
+                    await GetFinishedGoodRecord();
+                }
+                catch (Exception ex)
+                {
+                    KryptonMessageBox.Show(this, $"Problem Connecting to cache server {AppSettings.CachedHost}", "Finished Good",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                }
                 if (!_syncWorker.IsBusy)lblLoading.Visible = false;
             }
             if (kryptonNavigator1.SelectedIndex == 2)
@@ -962,7 +969,6 @@ namespace LaserPrinting
             bindingSource1.DataSource = _bindingList;
             kryptonDataGridView2.DataSource = bindingSource1;
             Tb_FinishedGoodCounter.Text = list.Length.ToString();
-
         }
 
         private void Tb_MfgOrder_KeyDown(object sender, KeyEventArgs e)
