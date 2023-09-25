@@ -85,10 +85,20 @@ namespace LaserPrinting.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Minime Workflow")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Gaia Workflow")]
         public string WorkFlow {
             get {
                 return ((string)(this["WorkFlow"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=\"127.0.0.1\";Initial Catalog=\"9784\";User id=\"wik\";Password=\"passwordwi" +
+            "k\";")]
+        public string WeighingDatabaseConnection {
+            get {
+                return ((string)(this["WeighingDatabaseConnection"]));
             }
         }
     }

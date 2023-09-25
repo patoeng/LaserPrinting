@@ -21,7 +21,10 @@
       <Value Profile="(Default)">8</Value>
     </Setting>
     <Setting Name="WorkFlow" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Minime Workflow</Value>
+      <Value Profile="(Default)">Gaia Workflow</Value>
+    </Setting>
+    <Setting Name="WeighingDatabaseConnection" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Data Source="127.0.0.1";Initial Catalog="9784";User id="wik";Password="passwordwik";</Value>
     </Setting>
   </Settings>
 </SettingsFile>

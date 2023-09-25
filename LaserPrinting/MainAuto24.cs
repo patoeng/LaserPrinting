@@ -21,6 +21,7 @@ using OpcenterWikLibrary;
 using PopUpMessage;
 using System.Linq.Dynamic;
 using System.Threading;
+using MesData.Common;
 
 namespace LaserPrinting
 {
@@ -38,6 +39,9 @@ namespace LaserPrinting
         private BindingList<FinishedGoodLaser> _bindingList;
         private BackgroundWorker _syncWorker;
         private AbortableBackgroundWorker _moveWorker;
+        private AutoStandBy _autoStandBy;
+        private string _standByConnection;
+        private bool _startStandByTimer;
 
         public MainAuto24()
         {
@@ -47,6 +51,7 @@ namespace LaserPrinting
             InitFileWatcher();
             ClearTextBox();
             SetProductionState(ProductionState.Idle);
+            InitStandByTimer(_standByConnection);
             tmrFirstLoad.Start();
         }
         public void InitLaserPrinting()
@@ -54,12 +59,12 @@ namespace LaserPrinting
 
 #if MiniMe
             var name = "Laser Marking Minime";
-             Text = Mes.AddVersionNumber(name);
 #elif Ariel
             var name = "Laser Marking Ariel";
-            Text = Mes.AddVersionNumber(name);
+#elif Gaia
+            var name = "Laser Marking GAIA";
 #endif
-
+            Text = name + @" V1.4";
             _mesData = new Mes(name, AppSettings.Resource,name);
 
             MyTitle.Text = @"Laser Printing";
@@ -118,7 +123,9 @@ namespace LaserPrinting
 
         private void MoveWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            var list = (List<LaserPrintingProduct>) e.Argument;
+           
+
+             var list = (List<LaserPrintingProduct>) e.Argument;
             foreach (var sn in list)
             {
                 if (sn.ArticleNumber != _mesData.ManufacturingOrder.Product.Name)
@@ -142,7 +149,7 @@ namespace LaserPrinting
 
         private void MoveWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+            _startStandByTimer = true;
         }
 
         private void InitFileWatcher()
@@ -168,10 +175,53 @@ namespace LaserPrinting
             _productWorkflow = setting.WorkFlow;
             Tb_DummyQty.Value = setting.DummyQty;
             Tb_TimeOffset.Value =(decimal) setting.TimeOffset;
+            _standByConnection = setting.WeighingDatabaseConnection;
+        }
+        #region Auto Standby
+        public void InitStandByTimer(string connection)
+        {
+            _standByConnection = connection;
+            _autoStandBy = new AutoStandBy(_mesData, this)
+            {
+                StandbyStatus = "LS - Standby Time",
+                DefaultPreStandbyStatus = "LS - Productive Time",
+                DefaultPreStandbyStatusReason = "Pass",
+                MaintenanceStatus = "LS - Internal Downtime"
+            };
+            _autoStandBy.AutoStandByStatusUpdated += AutoStandByStatusUpdated;
+            _autoStandBy.Init(connection);
+            tbPrePopUp.Text = _autoStandBy.AutoStandBySetting.PrePopUpTimer.ToString("0.##");
+            tbPreStandBy.Text = _autoStandBy.AutoStandBySetting.PreStandByTimer.ToString("0.##");
+            _startStandByTimer = true;
+            tmrAutoStandByChecker.Start();
         }
 
+        private void AutoStandByStatusUpdated(StandByState standbystate)
+        {
+            GetStatusOfResource();
+        }
+
+
+        public void RestoreStatusPreStandBy()
+        {
+            _autoStandBy.RestoreStatusPreStandBy(_autoStandBy.StatusPreStandby);
+        }
+
+        public void StartStandByTimer()
+        {
+            if (_autoStandBy == null) return;
+            _autoStandBy.StartStandByTimer();
+        }
      
-        private   bool DatalogParserMethod(string fileLocation)
+       
+
+        public void StopStandByTimer()
+        {
+            _autoStandBy?.StopPopUpTimer();
+            _autoStandBy?.StopStandByTimer();
+        }
+        #endregion
+        private bool DatalogParserMethod(string fileLocation)
         {
             if (_moveWorker.IsBusy) return false;
 
@@ -222,7 +272,8 @@ namespace LaserPrinting
             }
 
             if (_mesData.ResourceStatusDetails?.ReasonCodeName?.Value == "Maintenance") return true;
-
+            _startStandByTimer = false;
+            RestoreStatusPreStandBy();
             _moveWorker.RunWorkerAsync(list);
             return true;
         }
@@ -265,7 +316,7 @@ namespace LaserPrinting
                     if (productChanges != null)
                     {
                         //Make Sure correct WorkFlow
-                        if (productChanges.Workflow.Name != _productWorkflow)
+                        if (productChanges.Workflow.Name.ToUpper() != _productWorkflow.ToUpper())
                         {
                             _mesData.SetManufacturingOrder(mfg);
                             ClearTextBox();
@@ -314,21 +365,9 @@ namespace LaserPrinting
                       GetStatusOfResource();
                 }
 
-                //var inRedis =   Mes.GetFinishGoodRecordFromCached(_mesData, _mesData.ManufacturingOrder?.Name.ToString());
-                //if (inRedis == null)
-                //{
-                //    MessageBox.Show(@"Local Cache server error!");
-                //    return true;
-                //}
-
-                //if (mfg.Containers == null)
-                //{
-                //    return true;
-                //}
-                //if (inRedis.Count != mfg.Containers.Length) 
-                //{
-                    ThreadHelper.Execute(async ()=> await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString()));
-                //}
+               
+                ThreadHelper.Execute(async ()=> await Mes.GetFinishGoodRecordSyncWithServer(_mesData, _mesData.ManufacturingOrder?.Name.ToString()));
+             
 
                 return true;
             }
@@ -339,7 +378,7 @@ namespace LaserPrinting
         }
      
 
-        private   string StartMoveInMove(LaserPrintingProduct product)
+        private   string  StartMoveInMove(LaserPrintingProduct product)
         {
             try
             {
@@ -460,7 +499,7 @@ namespace LaserPrinting
 
                    
                      
-                        if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && _mesData?.ResourceStatusDetails?.Reason?.Name!= "Quality Inspection")
+                        if (_currentPo.ContainerList.Count >= _currentPo.DummyQty && _mesData?.ResourceStatusDetails?.Reason?.Name!= "Quality Inspection" && !_currentPo.PreparationFinished)
                         {
                               Mes.SetResourceStatus(_mesData, "LS - Productive Time", "Quality Inspection");
                               GetStatusOfResource();
@@ -494,11 +533,12 @@ namespace LaserPrinting
                 {
                     _mesData.SetResourceStatusDetails(resourceStatus);
                     if (resourceStatus.Status != null) Tb_StatusCode.Text = resourceStatus.Reason?.Name;
+                    if (resourceStatus.Reason?.Name == "Standby") _autoStandBy.SetToStandBy(); else _autoStandBy.ResetStandBy();
                     if (resourceStatus.Availability != null)
                     {
                         if (resourceStatus.Availability.Value == "Up")
                         {
-                            Tb_StatusCode.StateCommon.Content.Color1 = resourceStatus.Reason?.Name == "Quality Inspection" ? Color.Orange : Color.Green;
+                            Tb_StatusCode.StateCommon.Content.Color1 = resourceStatus.Reason?.Name == "Standby" ? Color.Yellow :(resourceStatus.Reason?.Name == "Quality Inspection"? Color.Orange: Color.Green);
                         }
                         else if (resourceStatus.Availability.Value == "Down")
                         {
@@ -792,7 +832,7 @@ namespace LaserPrinting
                 }
             }
             
-              GetStatusOfResource();
+            GetStatusOfResource();
 
            
             SetProductionState(ProductionState.ManufacturingOrderSet);
@@ -902,6 +942,7 @@ namespace LaserPrinting
                 var result = false;
                 if (Cb_StatusCode.Text != "" && Cb_StatusReason.Text != "")
                 {
+                    if (Cb_StatusReason.Text == "Standby") _autoStandBy.SetToStandBy(); else _autoStandBy.ResetStandBy();
                     result =   Mes.SetResourceStatus(_mesData, Cb_StatusCode.Text, Cb_StatusReason.Text);
                 }
                 else if (Cb_StatusCode.Text != "")
@@ -1158,6 +1199,20 @@ namespace LaserPrinting
             if (_bindingList == null) return;
             kryptonDataGridView2.DataSource = _sortAscending ? _bindingList.OrderBy(kryptonDataGridView2.Columns[e.ColumnIndex].DataPropertyName).ToList() : _bindingList.OrderBy(kryptonDataGridView2.Columns[e.ColumnIndex].DataPropertyName).Reverse().ToList();
             _sortAscending = !_sortAscending;
+        }
+
+        private void btnSaveSetting_Click(object sender, EventArgs e)
+        {
+            _autoStandBy.SetStandByTimer((double)tbPreStandBy.Value, (double)tbPrePopUp.Value);
+            _autoStandBy.SaveCurrentSetting(_standByConnection);
+        }
+
+       
+        private void tmrAutoStandByChecker_Tick(object sender, EventArgs e)
+        {
+            tmrAutoStandByChecker.Stop();
+            if (_startStandByTimer) StartStandByTimer(); else StopStandByTimer();
+            tmrAutoStandByChecker.Start();
         }
     }
 }
